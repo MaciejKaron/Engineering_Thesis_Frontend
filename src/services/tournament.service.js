@@ -7,8 +7,8 @@ class TournamentService {
         return axios.post(API_URL + 'tournaments', data)
     }
 
-    findAllTournaments() {
-        return axios.get(API_URL + 'tournaments/all')
+    findAllTournaments(currentPage, searchTitle, pageSize) {
+        return axios.get(API_URL + `tournaments/all?page=${currentPage}&title=${searchTitle}&size=${pageSize}`)
     }
 
     findOneTournament(id) {
