@@ -1,9 +1,9 @@
 <template>
  <div id="app">
     <nav class="navbar navbar-expand navbar-dark bg-dark">
-      <a href="/" class="navbar-brand">QuickClash</a>
+      <a class="navbar-brand">QuickClash</a>
       <div class="navbar-nav mr-auto">
-        <li class="nav-item">
+        <li v-if="currentUser" class="nav-item">
           <router-link to="/home" class="nav-link">
             <font-awesome-icon icon="home" /> Home
           </router-link>
@@ -17,8 +17,8 @@
         <li class="nav-item">
           <router-link v-if="currentUser" to="/user" class="nav-link">User</router-link>
         </li>
-        <li v-if="showAdminBoard" class="nav-item">
-          <router-link to="/tournament/add" class="nav-link">Add Clash</router-link>
+        <li class="nav-item">
+          <router-link v-if="currentUser" to="/premium" class="nav-link">Premium</router-link>
         </li>
       </div>
       <div v-if="!currentUser" class="navbar-nav ml-auto">
@@ -82,5 +82,12 @@ export default {
 </script>
 
 <style>
+.navbar-brand{
+  color: white !important;
+}
+
+.container{
+  max-width: 100%;
+}
 
 </style>

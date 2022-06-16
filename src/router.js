@@ -4,11 +4,11 @@ import Login from "./components/Login.vue";
 import Register from "./components/Register.vue";
 // lazy-loaded
 const Profile = () => import("./components/Profile.vue")
-const BoardAdmin = () => import("./components/BoardAdmin.vue")
+const BoardAdmin = () => import("./views/BoardAdmin.vue")
 const BoardModerator = () => import("./components/BoardModerator.vue")
 const BoardUser = () => import("./components/BoardUser.vue")
-const TournamentAdd = () => import("./components/TournamentAdd.vue")
 const TournamentEdit = () => import("./components/TournamentEdit.vue")
+const Premium = () => import("./views/Premium.vue")
 
 const routes = [
     {
@@ -53,17 +53,17 @@ const routes = [
         component: BoardUser,
     },
     {
-        path: "/tournament/add",
-        name: "tournamentAdd",
-        // lazy-loaded
-        component: TournamentAdd,
-    },
-    {
         path: "/tournament/edit/:id",
         name: "tournamentEdit",
         // lazy-loaded
         component: TournamentEdit,
     },
+    {
+        path: "/premium",
+        name: "premium",
+        // lazy-loaded
+        component: Premium,
+      },
       
 ]
 

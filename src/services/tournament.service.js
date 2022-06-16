@@ -11,6 +11,10 @@ class TournamentService {
         return axios.get(API_URL + `tournaments/all?page=${currentPage}&title=${searchTitle}&size=${pageSize}`)
     }
 
+    findAllPublishedTournaments(currentPage,searchTitle,pageSize) {
+        return axios.get(API_URL + `tournaments/published?page=${currentPage}&title=${searchTitle}&size=${pageSize}`)
+    }
+
     findOneTournament(id) {
         return axios.get(API_URL + `tournaments/${id}`)
     }
@@ -28,7 +32,15 @@ class TournamentService {
     }
 
     findTournamentByTitle(title) {
-        return axios.get(API_URL + `tournaments/all?title=${title}`)
+        return axios.get(API_URL + `tournaments/published?title=${title}`)
+    }
+
+    addUserToTournament(id,data) {
+        return axios.post(API_URL + `tournaments/join/${id}`, data)
+    }
+
+    leaveUserFromTournament(id, data) {
+        return axios.post(API_URL + `tournaments/rejoin/${id}`, data)
     }
 }
 

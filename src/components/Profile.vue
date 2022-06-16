@@ -11,7 +11,7 @@
     </p>
     <p>
       <strong>Id:</strong>
-      {{currentUser.id}}
+      {{currentUser._id}}
     </p>
     <p>
       <strong>Email:</strong>
@@ -21,6 +21,10 @@
     <ul>
       <li v-for="role in currentUser.roles" :key="role">{{role}}</li>
     </ul>
+    <p>
+      <strong>Vip:</strong>
+      {{currentUser.vip}}
+    </p>
   </div>
 </template>
 <script>
