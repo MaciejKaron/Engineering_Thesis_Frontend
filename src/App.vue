@@ -34,6 +34,12 @@
         </li>
       </div>
       <div v-if="currentUser" class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <router-link to="/friends" class="nav-link">
+         <font-awesome-icon icon="magnifying-glass" />
+          Search Friends
+        </router-link>
+      </li>
         <li class="nav-item">
           <router-link to="/profile" class="nav-link">
             <font-awesome-icon icon="user" />

@@ -27,6 +27,30 @@ class UserService {
     updateUser(id, data) {
         return axios.put(API_URL2 + `user/${id}`, data)
     }
+
+    findAllUsers(searchName) {
+        return axios.get(API_URL2 + `user/find/all?username=${searchName}`)
+    }
+
+    addToPending(id, data) {
+        return axios.post(API_URL2 + `user/friend/${id}`, data)
+    }
+
+    removeFromFriends(id, data) {
+        return axios.post(API_URL2 + `user/unfriend/${id}`, data)
+    }
+
+    confirmTheInvitation(id, data) {
+        return axios.post(API_URL2 + `user/accept/${id}`, data)
+    }
+
+    removeFromPending(id, data) {
+        return axios.post(API_URL2 + `user/remove/${id}`, data)
+    }
+
+    declineTheInvitation(id, data) {
+        return axios.post(API_URL2 + `user/decline/${id}`, data)
+    }
     
 }
 

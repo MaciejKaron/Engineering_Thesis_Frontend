@@ -9,12 +9,14 @@ const BoardModerator = () => import("./components/BoardModerator.vue")
 const BoardUser = () => import("./components/BoardUser.vue")
 const TournamentEdit = () => import("./components/TournamentEdit.vue")
 const Premium = () => import("./views/Premium.vue")
+const Friends = () => import("./views/Friends.vue")
+const UserProfile = () => import("./views/UserProfile")
 
 const routes = [
     {
         path: "/",
-        name: "home",
-        component: Home,
+        name: "start",
+        component: Login,
     },
     {
         path: "/home",
@@ -63,7 +65,19 @@ const routes = [
         name: "premium",
         // lazy-loaded
         component: Premium,
-      },
+    },
+    {
+        path: "/friends",
+        name: "friends",
+        //lazy-loaded
+        component: Friends,
+    },
+    {
+        path: "/user/profile/:id",
+        name: "UserProfile",
+        //lazy- loaded
+        component: UserProfile,
+    },
       
 ]
 

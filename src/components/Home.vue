@@ -66,7 +66,7 @@
             <label><strong>Players:</strong></label> {{currentTournament.players}}
         </div>
         <div>
-            <label><strong>Players:</strong></label> 
+            <label><strong>Start Time:</strong></label> {{currentTournament.startTime}} 
         </div>
         <a class="badge badge-warning" :href="'tournament/edit/' + currentTournament._id">Edit</a>
         <button class="join_button" @click="joinUserToTournament">JOIN</button>
