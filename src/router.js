@@ -11,6 +11,8 @@ const TournamentEdit = () => import("./components/TournamentEdit.vue")
 const Premium = () => import("./views/Premium.vue")
 const Friends = () => import("./views/Friends.vue")
 const UserProfile = () => import("./views/UserProfile")
+const Team = () => import("./views/Team")
+const myTeam = () => import("./views/myTeam")
 
 const routes = [
     {
@@ -77,6 +79,18 @@ const routes = [
         name: "UserProfile",
         //lazy- loaded
         component: UserProfile,
+    },
+    {
+        path: "/team",
+        name: "team",
+        //lazy-loaded
+        component: Team,
+    },
+    {
+        path: "/myTeam/:id",
+        name: "myTeam",
+        //lazy-loaded
+        component: myTeam,
     },
       
 ]

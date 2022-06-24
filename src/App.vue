@@ -35,6 +35,11 @@
       </div>
       <div v-if="currentUser" class="navbar-nav ml-auto">
       <li class="nav-item">
+        <router-link to="/team" class="nav-link">
+          Create Team
+        </router-link>
+      </li>
+      <li class="nav-item">
         <router-link to="/friends" class="nav-link">
          <font-awesome-icon icon="magnifying-glass" />
           Search Friends

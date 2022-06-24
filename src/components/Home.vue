@@ -66,7 +66,7 @@
             <label><strong>Players:</strong></label> {{currentTournament.players}}
         </div>
         <div>
-            <label><strong>Start Time:</strong></label> {{currentTournament.startTime}} 
+            <label><strong>Start Time:</strong></label> {{displayDate(currentTournament.startTime)}} 
         </div>
         <a class="badge badge-warning" :href="'tournament/edit/' + currentTournament._id">Edit</a>
         <button class="join_button" @click="joinUserToTournament">JOIN</button>
@@ -83,6 +83,7 @@
 <script>
 import tournamentService from "@/services/tournament.service";
 import userService from "@/services/user.service";
+import moment from "moment"
 
 export default {
     name: "Home-comp",
@@ -209,6 +210,11 @@ export default {
                 console.log(e)
             })
         },
+        displayDate(value) {
+            if (value) {
+                 return moment(String(value)).format('MM/DD/YYYY hh:mm a')
+            }
+        }
     },
     mounted() {
         this.getAllPublishedTournaments()
@@ -216,7 +222,7 @@ export default {
     computed: {
         currentUser() {
             return this.$store.state.auth.user
-        }
+        },
     },
 }
 </script>
