@@ -214,6 +214,9 @@ export default {
             if (value) {
                  return moment(String(value)).format('MM/DD/YYYY hh:mm a')
             }
+        },
+        log(message) {
+            console.log(message)
         }
     },
     mounted() {

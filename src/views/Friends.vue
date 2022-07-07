@@ -76,10 +76,14 @@ export default {
         setActiveUser(user, index) {
             this.thisUser = user
             this.currentIndex = index
+            console.log(this.thisUser)
         },
         goToProfile() {
             this.$router.push({name:'UserProfile', params: {id: this.thisUser._id}});
         },
+         log(message) {
+            console.log(message)
+        }
     },
     mounted() {
         this.getAllUsers()

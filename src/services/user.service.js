@@ -51,6 +51,14 @@ class UserService {
     declineTheInvitation(id, data) {
         return axios.post(API_URL2 + `user/decline/${id}`, data)
     }
+
+    findOneUserAndFriends(id) {
+        return axios.get(API_URL2 + `user/find/friends/${id}`)
+    }
+
+    findOneUserByUsername(id) {
+        return axios.get(API_URL2 + `user/username/${id}`)
+    }
     
 }
 

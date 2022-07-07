@@ -21,6 +21,10 @@ class TeamService {
     deleteAllTeams() {
         return axios.delete(API_URL + 'team/delete/all')
     }
+
+    addToPending(id, data) {
+        return axios.post(API_URL + `team/add/${id}`, data)
+    }
 }
 
 export default new TeamService()
