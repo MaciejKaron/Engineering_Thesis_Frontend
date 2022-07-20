@@ -1,5 +1,5 @@
 <template>
-    <div class="navBar">
+    <div class="navBar" id="navBar">
         <nav class="navbar navbar-expand navbar-dark bg-dark">
       <a class="navbar-brand">QuickClash</a>
       <div class="navbar-nav mr-auto">
@@ -97,12 +97,47 @@ export default {
     logOut() {
       this.$store.dispatch('auth/logout');
       this.$router.push('/login');
+    },
+    stickyNavbar() {
+      window.onscroll = function () { myFunction() }
+      var navBar = document.getElementById("navBar")
+      var sticky = navBar.offsetTop
+
+      function myFunction() {
+        if (window.pageYOffset >= sticky) {
+          navBar.classList.add("sticky")
+        } else {
+          navBar.classList.remove("sticky")
+        }
+      }
+    },
+    test() {
+      window.addEventListener("scroll", function () {
+        var navBar = document.querySelector(".navBar")
+        navBar.classList.toggle("sticky", window.scrollY)
+      })
     }
-  }
+  },
+  mounted() {
+    // this.stickyNavbar()
+    this.test()
+  },
 };
 </script>
 
 <style scoped>
+
+/* .navbar{
+  position: fixed;
+  top:0;
+  left:0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.6s;
+  z-index: 100;
+} */
 .navbar-brand{
   color: white !important;
 }

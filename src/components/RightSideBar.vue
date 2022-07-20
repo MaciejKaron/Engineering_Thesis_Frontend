@@ -3,34 +3,73 @@
 <div class="close">
     <button id="close-sideBar" @click="$emit('toggleBar')">X</button>
 </div>
+
 <div class="sidebar-title">
-<h4 id="title">FRIENDS</h4>    
+<h4 id="title">ONLINE FRIENDS</h4>    
 </div> 
-<div class="container"> 
+<div class="friends-container"> 
     <div class="row">
         <div class="col">
 <div class="sidebar-elements">
   <ul class="list-group" id="RightSideBar-comp">
             <li class="list-group-item" id="items"
         :class="{ active: index == currentIndex}"
-        v-for="(friend,index) in myFriends"
+        v-for="(friend,index) in onlineFriends"
         :key="index"
         @click="setActiveUser(friend, index)"
         >
-        {{friend}}
+        {{friend.username}}
         </li>
         </ul>
         </div>
         </div>
-        <div class="col">
+        <div class="col" id="buttons">
             <div class="sidebar-options" v-if="thisFriendUser">
   <ul class="list-group" id="RightSideBar-comp">
             <li class="list-group-item" id="options"
-        v-for="(friend,index) in myFriends"
+        v-for="(friend,index) in onlineFriends"
         :key="index"
         >
-        <button id="profile-button" v-show="thisFriendUser.username == friend" @click="goToProfile"><font-awesome-icon icon="user" /></button>
-        <button id="invite-button" v-show="thisFriendUser.username == friend" @click="addToPending"><font-awesome-icon icon="envelope" /></button>
+        <button id="profile-button" v-show="thisFriendUser.username == friend.username" @click="goToProfile"><font-awesome-icon icon="user" /></button>
+        <button id="invite-button" v-show="thisFriendUser.username == friend.username" @click="addToPending"><font-awesome-icon icon="envelope" /></button>
+        <button id="chat-button" v-show="thisFriendUser.username == friend.username" ><font-awesome-icon icon="comment" /></button>
+        </li>
+        </ul>
+        </div>
+
+        </div>
+</div>
+</div>
+
+<div class="sidebar-title">
+<h4 id="title">ALL FRIENDS</h4>    
+</div> 
+<div class="friends-container"> 
+    <div class="row">
+        <div class="col">
+<div class="sidebar-elements">
+  <ul class="list-group" id="RightSideBar-comp">
+            <li class="list-group-item" id="items" 
+        :class="{ active: index == currentIndex}"
+        v-for="(friend,index,) in myAllFriendsWithoutOnline"
+        :key="index"
+        @click="setActiveUser(friend, index)"
+        >
+        {{friend.username}}
+        </li>
+        </ul>
+        </div>
+        </div>
+        <div class="col" id="buttons">
+            <div class="sidebar-options" v-if="thisFriendUser">
+  <ul class="list-group" id="RightSideBar-comp">
+            <li class="list-group-item" id="options" 
+        v-for="(friend,index) in myAllFriendsWithoutOnline"
+        :key="index"
+        >
+        <button id="profile-button" v-show="thisFriendUser.username == friend.username" @click="goToProfile"><font-awesome-icon icon="user" /></button>
+        <button id="invite-button" v-show="thisFriendUser.username == friend.username" @click="addToPending"><font-awesome-icon icon="envelope" /></button>
+        <button id="chat-button" v-show="thisFriendUser.username == friend.username" @click="$emit('toggleChat') ; createConversation()"><font-awesome-icon icon="comment" /></button>
         </li>
         </ul>
         </div>
@@ -44,9 +83,15 @@
 <script>
 import userService from "@/services/user.service";
 import teamService from "@/services/team.service";
+import socketioService from "@/services/socketio.service";
+import conversationService from "@/services/conversation.service"
 export default {
     props: [
-        'open'
+        "open",
+    ],
+    emits: [
+        "toggleBar",
+        "toggleChat",
     ],
     name: "RightSideBar-comp",
     data() {
@@ -56,67 +101,108 @@ export default {
             thisFriendUser: null,
             thisUser: null,
             currentIndex: -1,
-        }
+            onlineUsers: [],
+            onlineFriends: [],
+            myAllFriendsWithoutOnline: [],
+        };
     },
     methods: {
-         //get current user
-          getOneCurrentUser(id) {
+        //get current user
+        getOneCurrentUser(id) {
             userService.findOneUser(id)
                 .then(response => {
-                    this.thisCurrentUser = response.data
-                })
-                .catch(e => {
-                console.log(e)
+                this.thisCurrentUser = response.data;
             })
+                .catch(e => {
+                console.log(e);
+            });
         },
         getFriendsUsernames(id) {
             userService.findOneUserAndFriends(id)
                 .then(response => {
-                    this.myFriends = response.data
-                })
-                .catch(e => {
-            console.log(e)
-          })  
-        },
-        findOneUserByUsername(id) {
-            userService.findOneUserByUsername(id)
-                .then(response => {
-                    this.thisFriendUser = response.data
-                    console.log(this.thisFriendUser)
+                    this.myFriends = response.data;
+                    // console.log(this.myFriends)
             })
+                .then(() => {
+                this.$watch("onlineUsers", () => {
+                    this.findOnlineFriends();
+                });
+            })
+                .catch(e => {
+                console.log(e);
+            });
         },
-         setActiveUser(friend, index) {
-            this.thisUser = friend
-             this.currentIndex = index
-             this.findOneUserByUsername(this.thisUser)
+        findOneUserByUsername(username) {
+            userService.findOneUserByUsername(username)
+                .then(response => {
+                this.thisFriendUser = response.data;
+                // console.log(this.thisFriendUser);
+            });
+        },
+        addUserSocket() {
+            // socketioService.socket.emit("addUser", this.currentUser._id);  //duplicate in chatBar
+            socketioService.socket.on("getUsers", (users) => {
+                this.onlineUsers = this.thisCurrentUser.friends.filter(f => users.some(u => u.userId === f));
+                // console.log(this.onlineUsers)
+            });
+        },
+        findOnlineFriends() {
+            //get ONLINE FRIENDS
+            this.onlineFriends = this.myFriends.filter(f => this.onlineUsers.includes(f._id));
+            //get ALL FRIENDS WITHOUT ONLINE
+            this.myAllFriendsWithoutOnline = this.myFriends.filter(f => !this.onlineUsers.includes(f._id))
+        },
+        setActiveUser(friend, index) {
+            this.thisUser = friend;
+            this.currentIndex = index;
+            this.findOneUserByUsername(this.thisUser.username);
         },
         goToProfile() {
-            this.$router.push({ name: 'UserProfile', params: { id: this.thisFriendUser._id } });
+            this.$router.push({ name: "UserProfile", params: { id: this.thisFriendUser._id } });
         },
         log(message) {
-            console.log(message)
+            console.log(message);
         },
         addToPending() {
             var data = {
                 _id: this.thisCurrentUser.team
-            }
+            };
             teamService.addToPending(this.thisFriendUser._id, data)
                 .then(response => {
-                console.log(response.data)
-                })
-                .catch(e => {
-                console.log(e)
+                console.log(response.data);
             })
+                .catch(e => {
+                console.log(e);
+            });
+        },
+        createConversation() {
+            var data = {
+                senderId: this.currentUser._id,
+                receiverId: this.thisFriendUser._id
+            };
+            conversationService.createConversation(data)
+                .then(response => {
+                    console.log(response);
+                //ZNAJDUJE NOWA KONWERSACJE ALE NIE REFRESUJE
+                conversationService.getConversation(this.currentUser._id)
+                    .then(response => {
+                        console.log(response)
+                })
+                });
         },
     },
     mounted() {
-        this.getOneCurrentUser(this.currentUser._id)
-         this.getFriendsUsernames(this.currentUser._id) 
+        this.getOneCurrentUser(this.currentUser._id);
+        this.getFriendsUsernames(this.currentUser._id);
+        this.addUserSocket();
     },
     computed: {
         currentUser() {
-            return this.$store.state.auth.user
+            return this.$store.state.auth.user;
         }
+    },
+    created() {
+        socketioService.setupSocketConnection();
     },
 }
     
@@ -127,7 +213,7 @@ export default {
     float: right;
    display: flex;
     justify-content: flex-start;
-    align-items: center;
+    /* align-items: center; */
     position: relative;
     flex-direction: column;
     width: 250px;
@@ -136,6 +222,7 @@ export default {
     background-color: rgb(106, 106, 179);  
     z-index: 10;
      overflow-y: scroll;
+     overflow-x: hidden;
 }
 
 #items {
@@ -145,6 +232,7 @@ export default {
       width: 100px;
       height: 50px;
       margin-bottom: 8px;
+      margin-left: 0.2em;
       cursor: pointer;
       color: #fefefe;
       background-color: #242424;
@@ -164,20 +252,30 @@ export default {
 }
 
 #invite-button{
-    margin-left: 0.5em;
+    margin-left: 0.2em;
+}
+
+#chat-button{
+    margin-left: 0.2em;
 }
 
 #title{
     margin-bottom: 1em;
+    text-align: center;
 }
 
 .close{
-    width:200px
+    width:100%;
 }
 
 #close-sideBar{
     margin-bottom: 0.5em;
+    margin-right: 0.5em;
     float: right;
+}
+
+#buttons{
+    padding-left: 0px !important;
 }
 
 </style>

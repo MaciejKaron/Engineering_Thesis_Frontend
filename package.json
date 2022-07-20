@@ -21,6 +21,7 @@
     "jquery": "^3.6.0",
     "moment": "^2.29.3",
     "roboto-fontface": "*",
+    "socket.io-client": "^4.5.1",
     "vee-validate": "^4.5.11",
     "vue": "^3.2.13",
     "vue-moment": "^4.1.0",

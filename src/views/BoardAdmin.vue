@@ -12,7 +12,7 @@
         <div v-if="!submitted">
         <div class="form-group">
             <label for="title">Title</label>
-            <input type="text" class="form-control" id="title" required v-model="tournament.title" name="title" />
+            <input type="text" class="form-control" id="tournament-title" required v-model="tournament.title" name="title" />
         </div>
         <div class="form-group">
             <label for="description">Description</label>

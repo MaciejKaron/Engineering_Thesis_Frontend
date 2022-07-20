@@ -1,8 +1,8 @@
 <template>
  <div id="app">
    <NavBar @toggleBar="sideBarOpen = !sideBarOpen"/>
-   <RightSideBar @toggleBar="sideBarOpen = !sideBarOpen" :open="sideBarOpen"/>
-   <ChatBar @toggleChat="chatOpen = !chatOpen" :open="chatOpen" />
+   <RightSideBar @toggleBar="sideBarOpen = !sideBarOpen" :open="sideBarOpen" @toggleChat="chatOpen= true"/>
+   <ChatBar @toggleChat="chatOpen = !chatOpen" :openChat="chatOpen" />
     <div class="container">
       <router-view :key="$route.path"/>
     </div>
@@ -13,12 +13,13 @@
 import NavBar from './components/NavBar.vue'
 import RightSideBar from './components/RightSideBar.vue'
 import ChatBar from './components/ChatBar.vue'
+import { ref } from 'vue'
 export default {
   name: "App",
   data() {
     return {
       sideBarOpen: false,
-      chatOpen: false
+      chatOpen: ref(false)
   }
   },
   components: {

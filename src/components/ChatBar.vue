@@ -1,10 +1,10 @@
 <template>
 <div class="chatButton-switch" v-if="currentUser">
-<div class="chatButton" v-if="!open">
+<div class="chatButton" v-if="!$props.openChat">
     <button id="chatB" @click="$emit('toggleChat') ; getConversationFriends()"><font-awesome-icon size="2x" icon="comment-dots" /></button>
 </div>
 </div>
-<div class="chatbar" v-if="open">
+<div class="chatbar" v-if="$props.openChat">
     <div class="container">
         <div class="row h-10">
             <div class="close-chat">
@@ -32,13 +32,13 @@
                 <span id="noConversation" v-if="!currentChat">Open a conversation to start a chat</span>
                 <div v-for="(message,index) in messages"
                 :key="index">
-                    <div class="currentTexter" v-show="message.sender === thisCurrentUser._id">
+                    <div class="currentTexter" v-show="message.sender === thisCurrentUser._id && currentChat">
                         {{message.text}}
                         <div class="data">
                         {{displayDate(message.createdAt)}}
                         </div>
                     </div>
-                    <div class="otherTexter" v-show="message.sender !== thisCurrentUser._id">
+                    <div class="otherTexter" v-show="message.sender !== thisCurrentUser._id && currentChat">
                         {{message.text}}
                         <div class="data">
                         {{displayDate(message.createdAt)}}
@@ -54,7 +54,7 @@
                             <textarea class="form-control" id="text-area" v-model="newMessage" rows="3" placeholder="Your message ..."></textarea>
                         </div>
                         <div class="button-a">
-                            <button class="send-message" @click="createMessage()">Send</button>
+                            <button class="send-message" @click="createMessage(); sendMessageSocket()">Send</button>
                         </div>
                         </div>
                     </div>
@@ -70,9 +70,10 @@ import userService from "@/services/user.service";
 import conversationService from "@/services/conversation.service"
 import messageService from "@/services/message.service";
 import moment from "moment"
+import socketioService from "@/services/socketio.service"
 export default {
     props: [
-        'open'
+        'openChat'
     ],
     emits: [
         "toggleChat"
@@ -88,8 +89,11 @@ export default {
             messages: [],
             newMessage: "",
             ownMessages: [],
+            messageDate: null,
             thisUser: null,
             currentIndex: -1,
+            socket: null,
+            arrivalMessage: [],
         }
     },
     methods: {
@@ -98,7 +102,7 @@ export default {
             userService.findOneUser(id)
                 .then(response => {
                     this.thisCurrentUser = response.data
-                    console.log(this.thisCurrentUser)
+                    // console.log(this.thisCurrentUser)
                 })
                 .catch(e => {
                 console.log(e)
@@ -122,7 +126,7 @@ export default {
                     this.currentChat = response.data
                     this.getMessages(this.currentChat._id)
                     this.scrollToBottom()
-                    console.log(this.currentChat)
+                    // console.log(this.currentChat)
                 })
                 .catch(e => {
                 console.log(e)
@@ -138,10 +142,10 @@ export default {
                          this.conversationFriend = response.data
                          if (this.conversationFriends.length < this.conversations.length) {
                              this.conversationFriends.push(this.conversationFriend)
+                             console.log(this.conversationFriends)
                          }
             })
             } 
-
         },
          setActiveConversation(friend, index) {
             this.thisUser = friend
@@ -153,12 +157,11 @@ export default {
             messageService.getMessage(id)
                 .then(response => {
                     this.messages = response.data
-                    // for (var i = 0; i < this.messages.length; i++) {
-                    //     if (this.messages[i].sender === this.currentUser._id) {
-                    //         this.ownMessages = this.messages[i]
-                    //     }
-                    // }
-                    console.log(this.messages)
+                    //AFTER SELECT CURRENT CHAT - SCROLL TO BOTTOM
+                    this.$nextTick(function () {
+                    var container = document.querySelector(".row.h-70")
+                    container.scrollTop = container.scrollHeight
+                     })
             })
         },
         createMessage() {
@@ -170,12 +173,54 @@ export default {
             messageService.createMessage(data)
                 .then(response => {
                     this.getCurrentChat(this.thisUser._id, this.currentUser._id)
-                    this.scrollToBottom()
+                    this.$watch('messages', () => {
+                        this.scrollToBottom()
+                    })
+                    this.getMessages(this.currentChat._id)
+                    this.messageDate = response.data.createdAt
                     this.newMessage = ""
                     console.log(response.data)
-          })
+                })
+                
         },
 
+        sendMessageSocket() {
+            //check every currentChat memer and if it's this member wchich userId is not equal current user id == our friend
+            const receiverId = this.currentChat.members.find((member) => member !== this.currentUser._id)
+            socketioService.socket.emit("sendMessage", {
+                senderId: this.currentUser._id,
+                receiverId,
+                text: this.newMessage,
+                createdAt: this.messageDate
+            })
+        },
+
+        getMessageSocket() {
+            socketioService.socket.on("getMessage", (data) => {
+                this.messages.push({
+                    sender: data.senderId,
+                    text: data.text,
+                    createdAt: data.createdAt
+                })   
+                this.$nextTick(function () {
+            var container = document.querySelector(".row.h-70")
+            container.scrollTop = container.scrollHeight
+          })        
+            })
+        },
+        changeArrays() {
+            if (this.arrivalMessage) {
+                console.log('123')
+                
+                if (this.currentChat.members.includes(this.arrivalMessage.sender)) {
+                    this.messages = [...this.messages, this.arrivalMessage]
+                    // this.messages((prev) => [...prev, this.arrivalMessage])
+                    console.log('321')
+                    console.log(this.arrivalMessage)
+                    console.log(this.messages)
+            }
+            }  
+        },
         displayDate(value) {
             if (value) {
                  return moment(String(value)).format('MM.DD.YYYY hh:mm a')
@@ -186,14 +231,27 @@ export default {
             container.scrollTop = container.scrollHeight
             // document.getElementById("messages-column").scrollIntoView({ behavior: 'smooth', block: 'end' })
         },
-       
         log(message) {
             console.log(message)
+        },
+        testSocket() {
+       console.log(socketioService.socket.current);
+        },
+        addUserSocket() {
+            socketioService.socket.emit("addUser", this.currentUser._id)
+            socketioService.socket.on("getUsers", () => {  // (users)
+                // console.log(users)
+            })
         },
     },
     mounted() {
         this.getOneCurrentUser(this.currentUser._id)
         this.getCurrentUserConversations(this.currentUser._id)
+        this.addUserSocket()
+        this.getMessageSocket()
+    },
+    created() {
+        socketioService.setupSocketConnection()
     },
     computed: {
         currentUser() {
