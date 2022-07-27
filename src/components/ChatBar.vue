@@ -1,14 +1,17 @@
 <template>
 <div class="chatButton-switch" v-if="currentUser">
 <div class="chatButton" v-if="!$props.openChat">
-    <button id="chatB" @click="$emit('toggleChat') ; getConversationFriends()"><font-awesome-icon size="2x" icon="comment-dots" /></button>
+    <button id="chatB" @click="$emit('toggleChat')"><font-awesome-icon size="2x" icon="comment-dots" /></button>
 </div>
 </div>
 <div class="chatbar" v-if="$props.openChat">
+<!-- if window chat opened - print all conversation friends -->
+{{getConversationFriends()}}
+{{newReceiverId()}}
     <div class="container">
         <div class="row h-10">
             <div class="close-chat">
-                <button id="close" @click="$emit('toggleChat')">X</button>
+                <button id="close" @click="$emit('toggleChat'); clearConvFriends()">X</button>
             </div>
         </div>
         <div class="row h-90" id="Chat-window" >
@@ -20,7 +23,7 @@
                     v-for="(friend,index) in conversationFriends"
                     :key="index"
                     @click="setActiveConversation(friend, index)">
-
+            
                     {{friend.username}}
 
                     </li>
@@ -71,6 +74,7 @@ import conversationService from "@/services/conversation.service"
 import messageService from "@/services/message.service";
 import moment from "moment"
 import socketioService from "@/services/socketio.service"
+import { chat } from "../store/chat"
 export default {
     props: [
         'openChat'
@@ -94,6 +98,7 @@ export default {
             currentIndex: -1,
             socket: null,
             arrivalMessage: [],
+            receivedId: null
         }
     },
     methods: {
@@ -113,7 +118,7 @@ export default {
             conversationService.getConversation(id)
                 .then(response => {
                     this.conversations = response.data
-                console.log(this.conversations)
+                // console.log(this.conversations)
                 })
                 .catch(e => {
                 console.log(e)
@@ -134,19 +139,50 @@ export default {
         },
         //get conversation friends ids
         getConversationFriends() {
-            for (var i = 0; i < this.conversations.length; i++){
-                   const friendId = this.conversations[i].members.find((m) => m !== this.currentUser._id)
+            //Normal chat opened
+            if (chat.myAllConversations.length <= 0) {
+                for (var i = 0; i < this.conversations.length; i++) {
+                    const friendId = this.conversations[i].members.find((m) => m !== this.currentUser._id)
 
-                 userService.findOneUser(friendId)
-                     .then(response => {
-                         this.conversationFriend = response.data
-                         if (this.conversationFriends.length < this.conversations.length) {
-                             this.conversationFriends.push(this.conversationFriend)
-                             console.log(this.conversationFriends)
-                         }
-            })
-            } 
+                    userService.findOneUser(friendId)
+                        .then(response => {
+                            this.conversationFriend = response.data
+                            if (this.conversationFriends.length < this.conversations.length) {
+                                this.conversationFriends.push(this.conversationFriend)
+                                // console.log(this.conversationFriends)
+                            }
+                        })
+                }
+            }
+            
+            // Chat has been opened from RightSideBar
+            if (chat.myAllConversations.length > 0) {
+                for (var j = 0; j < chat.myAllConversations.length; j++) {
+                    const friendId = chat.myAllConversations[j].members.find((m) => m !== this.currentUser._id)
+
+                    userService.findOneUser(friendId)
+                        .then(response => {
+                            this.conversationFriend = response.data
+                            if (this.conversationFriends.length < chat.myAllConversations.length) {
+                                this.conversationFriends.push(this.conversationFriend)
+                                this.getCurrentChat(this.receivedId, this.currentUser._id)
+                                this.$watch('receivedId', () => {
+                                    this.getCurrentChat(this.receivedId, this.currentUser._id)
+                                })
+                                // console.log(chat.receiverId)
+                            }
+                        })
+                }
+            }
         },
+        newReceiverId() {
+            this.receivedId = chat.receiverId
+        },
+
+        clearConvFriends() {
+            this.conversationFriends = []
+        },
+
          setActiveConversation(friend, index) {
             this.thisUser = friend
              this.currentIndex = index
@@ -172,7 +208,11 @@ export default {
             }  
             messageService.createMessage(data)
                 .then(response => {
-                    this.getCurrentChat(this.thisUser._id, this.currentUser._id)
+                    if (chat.myAllConversations.length <= 0) {
+                        this.getCurrentChat(this.thisUser._id, this.currentUser._id)
+                    } else {
+                        this.getCurrentChat(chat.receiverId, this.currentUser._id)
+                    }
                     this.$watch('messages', () => {
                         this.scrollToBottom()
                     })
@@ -318,10 +358,17 @@ export default {
 
 .currentTexter{
     text-align: right;
+    word-wrap: break-word;
+    max-width: 100%;
+    margin-left: 50%;
+    
 }
 
 .otherTexter{
     text-align: left;
+    word-wrap: break-word;
+    max-width: 50%;
+    width: 50%;
 }
 
 

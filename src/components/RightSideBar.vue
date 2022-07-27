@@ -32,7 +32,7 @@
         >
         <button id="profile-button" v-show="thisFriendUser.username == friend.username" @click="goToProfile"><font-awesome-icon icon="user" /></button>
         <button id="invite-button" v-show="thisFriendUser.username == friend.username" @click="addToPending"><font-awesome-icon icon="envelope" /></button>
-        <button id="chat-button" v-show="thisFriendUser.username == friend.username" ><font-awesome-icon icon="comment" /></button>
+        <button id="chat-button" v-show="thisFriendUser.username == friend.username" @click="createConversation()"><font-awesome-icon icon="comment" /></button>
         </li>
         </ul>
         </div>
@@ -69,7 +69,7 @@
         >
         <button id="profile-button" v-show="thisFriendUser.username == friend.username" @click="goToProfile"><font-awesome-icon icon="user" /></button>
         <button id="invite-button" v-show="thisFriendUser.username == friend.username" @click="addToPending"><font-awesome-icon icon="envelope" /></button>
-        <button id="chat-button" v-show="thisFriendUser.username == friend.username" @click="$emit('toggleChat') ; createConversation()"><font-awesome-icon icon="comment" /></button>
+        <button id="chat-button" v-show="thisFriendUser.username == friend.username" @click="createConversation()"><font-awesome-icon icon="comment" /></button>
         </li>
         </ul>
         </div>
@@ -85,6 +85,7 @@ import userService from "@/services/user.service";
 import teamService from "@/services/team.service";
 import socketioService from "@/services/socketio.service";
 import conversationService from "@/services/conversation.service"
+import {chat} from "../store/chat"
 export default {
     props: [
         "open",
@@ -176,19 +177,28 @@ export default {
             });
         },
         createConversation() {
+            chat.receiverId = this.thisFriendUser._id
             var data = {
                 senderId: this.currentUser._id,
-                receiverId: this.thisFriendUser._id
+                receiverId: chat.receiverId
             };
             conversationService.createConversation(data)
                 .then(response => {
                     console.log(response);
-                //ZNAJDUJE NOWA KONWERSACJE ALE NIE REFRESUJE
-                conversationService.getConversation(this.currentUser._id)
-                    .then(response => {
-                        console.log(response)
+                     this.$nextTick(function () {
+                    conversationService.getConversation(this.thisCurrentUser._id)
+                        .then(responsev2 => {
+                    chat.myAllConversations = responsev2.data
+                    // console.log(chat.myAllConversations)
+                    this.$emit('toggleChat')
                 })
+                     })
                 });
+    
+        },
+
+        emitF() {
+            this.$emit('toggleChat')
         },
     },
     mounted() {
