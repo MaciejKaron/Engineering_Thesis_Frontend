@@ -12,7 +12,7 @@
         <div class="col">
 <div class="sidebar-elements">
   <ul class="list-group" id="RightSideBar-comp">
-            <li class="list-group-item" id="items"
+            <li class="list-group-item" id="itemsv1"
         :class="{ active: index == currentIndex}"
         v-for="(friend,index) in onlineFriends"
         :key="index"
@@ -31,7 +31,10 @@
         :key="index"
         >
         <button id="profile-button" v-show="thisFriendUser.username == friend.username" @click="goToProfile"><font-awesome-icon icon="user" /></button>
-        <button id="invite-button" v-show="thisFriendUser.username == friend.username" @click="addToPending"><font-awesome-icon icon="envelope" /></button>
+        <div class="invite-button-class">
+        <button id="invite-button-add" v-show="thisFriendUser.username == friend.username && thisFriendUser.teamInviteSend == false && thisFriendUser.isInTeam == false" @click="addToPending() ; sendInviteSocket()"><font-awesome-icon icon="envelope" /></button>
+        <button id="invite-button-remove" v-show="thisFriendUser.username == friend.username && thisFriendUser.teamInviteSend == true" @click="removeFromPending(); deleteInviteSocket()"><font-awesome-icon icon="rectangle-xmark" /></button>
+        </div>
         <button id="chat-button" v-show="thisFriendUser.username == friend.username" @click="createConversation()"><font-awesome-icon icon="comment" /></button>
         </li>
         </ul>
@@ -49,7 +52,7 @@
         <div class="col">
 <div class="sidebar-elements">
   <ul class="list-group" id="RightSideBar-comp">
-            <li class="list-group-item" id="items" 
+            <li class="list-group-item" id="itemsv1" 
         :class="{ active: index == currentIndex}"
         v-for="(friend,index,) in myAllFriendsWithoutOnline"
         :key="index"
@@ -68,7 +71,7 @@
         :key="index"
         >
         <button id="profile-button" v-show="thisFriendUser.username == friend.username" @click="goToProfile"><font-awesome-icon icon="user" /></button>
-        <button id="invite-button" v-show="thisFriendUser.username == friend.username" @click="addToPending"><font-awesome-icon icon="envelope" /></button>
+        <!-- <button id="invite-button" v-show="thisFriendUser.username == friend.username" @click="addToPending() ; sendInviteSocket()"><font-awesome-icon icon="envelope" /></button> -->
         <button id="chat-button" v-show="thisFriendUser.username == friend.username" @click="createConversation()"><font-awesome-icon icon="comment" /></button>
         </li>
         </ul>
@@ -99,12 +102,14 @@ export default {
         return {
             thisCurrentUser: [],
             myFriends: [],
-            thisFriendUser: null,
+            thisFriendUser: [],
             thisUser: null,
             currentIndex: -1,
             onlineUsers: [],
             onlineFriends: [],
             myAllFriendsWithoutOnline: [],
+            teamInviteSend: false,
+            isInTeam: false
         };
     },
     methods: {
@@ -137,7 +142,7 @@ export default {
             userService.findOneUserByUsername(username)
                 .then(response => {
                 this.thisFriendUser = response.data;
-                // console.log(this.thisFriendUser);
+                // console.log(this.thisFriendUser._id);
             });
         },
         addUserSocket() {
@@ -167,15 +172,58 @@ export default {
         addToPending() {
             var data = {
                 _id: this.thisCurrentUser.team
-            };
+            }
             teamService.addToPending(this.thisFriendUser._id, data)
                 .then(response => {
-                console.log(response.data);
+                    console.log(response.data);
+                    // this.teamInviteSend = true
+                this.$nextTick(function () {
+                    this.findOneUserByUsername(this.thisUser.username);
+                })
+                     
             })
                 .catch(e => {
                 console.log(e);
             });
         },
+        removeFromPending() {
+             var data = {
+                _id: this.thisCurrentUser.team
+            }
+            teamService.removeFromPending(this.thisFriendUser._id, data)
+                .then(response => {
+                    console.log(response.data)
+                    // this.teamInviteSend = false
+                this.$nextTick(function () {
+                    this.findOneUserByUsername(this.thisUser.username);
+                     })
+                })
+                .catch(e => {
+                console.log(e)
+            })
+        },
+
+        sendInviteSocket() {
+            if (this.thisFriendUser.isInTeam == false) {
+                const receiverId = this.thisFriendUser._id
+                socketioService.socket.emit("sendInvite", {
+                    receiverId,
+                    senderId: this.thisCurrentUser._id,
+                    teamId: this.thisCurrentUser.team
+                })
+            } else {
+                console.log("This user is in your team");
+            }
+        },
+
+        deleteInviteSocket() {
+                const receiverId = this.thisFriendUser._id
+                socketioService.socket.emit("sendInvite", {
+                    receiverId,
+                    deleteInvite: true
+                })
+        },
+
         createConversation() {
             chat.receiverId = this.thisFriendUser._id
             var data = {
@@ -196,23 +244,25 @@ export default {
                 });
     
         },
-
-        emitF() {
-            this.$emit('toggleChat')
-        },
+        getInfoSocket() {
+            socketioService.socket.on("getInfo", (data) => {
+                
+                this.thisFriendUser.teamInviteSend = data.teamInviteSend
+                this.thisFriendUser.isInTeam = data.isInTeam
+                
+            })
+        }
     },
     mounted() {
         this.getOneCurrentUser(this.currentUser._id);
         this.getFriendsUsernames(this.currentUser._id);
         this.addUserSocket();
+        this.getInfoSocket()
     },
     computed: {
         currentUser() {
             return this.$store.state.auth.user;
         }
-    },
-    created() {
-        socketioService.setupSocketConnection();
     },
 }
     
@@ -235,7 +285,7 @@ export default {
      overflow-x: hidden;
 }
 
-#items {
+#itemsv1 {
  display: flex;
       justify-content: center;
       align-items: center;

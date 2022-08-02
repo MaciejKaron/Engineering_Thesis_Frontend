@@ -37,7 +37,7 @@
       <li class="nav-item">
         <router-link to="/team" class="nav-link">
           <font-awesome-icon icon="people-group" />
-          Create Team
+          Team
         </router-link>
       </li>
       <li class="nav-item">
@@ -57,6 +57,12 @@
             <font-awesome-icon icon="user" />
             {{ currentUser.username }}
           </router-link>
+        </li>
+        <li>
+          <div class="nav-link" id="friends">
+            <font-awesome-icon icon="bell" />
+            
+          </div>
         </li>
         <li class="nav-item">
           <a class="nav-link" @click.prevent="logOut">

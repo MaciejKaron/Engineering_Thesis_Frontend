@@ -290,9 +290,6 @@ export default {
         this.addUserSocket()
         this.getMessageSocket()
     },
-    created() {
-        socketioService.setupSocketConnection()
-    },
     computed: {
         currentUser() {
             return this.$store.state.auth.user

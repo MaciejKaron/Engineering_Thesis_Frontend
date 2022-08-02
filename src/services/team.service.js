@@ -25,6 +25,26 @@ class TeamService {
     addToPending(id, data) {
         return axios.post(API_URL + `team/add/${id}`, data)
     }
+
+    removeFromPending(id, data) {
+        return axios.post(API_URL + `team/cancel/${id}`, data)
+    }
+
+    confirmTeamInvitation(id, data) {
+        return axios.post(API_URL + `team/accept/${id}`, data)
+    }
+
+    declineTeamInvitation(id, data) {
+        return axios.post(API_URL + `team/decline/${id}`, data)
+    }
+
+    removeFromTeam(id, data) {
+        return axios.post(API_URL + `team/remove/${id}`, data)
+    }
+
+    leaveTeam(id, data) {
+        return axios.post(API_URL + `team/leave/${id}`, data)
+    }
 }
 
 export default new TeamService()

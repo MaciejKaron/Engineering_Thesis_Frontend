@@ -3,6 +3,7 @@
    <NavBar @toggleBar="sideBarOpen = !sideBarOpen"/>
    <RightSideBar @toggleBar="sideBarOpen = !sideBarOpen" :open="sideBarOpen" @toggleChat=RightSideChatOpen() />
    <ChatBar @toggleChat="chatOpen = !chatOpen" :openChat="chatOpen" />
+   <teamInvite @toggleInvite="inviteOpen = true" @toggleInviteClose="inviteOpen = false" :open="inviteOpen" />
     <div class="container">
       <router-view :key="$route.path"/>
     </div>
@@ -13,6 +14,8 @@
 import NavBar from './components/NavBar.vue'
 import RightSideBar from './components/RightSideBar.vue'
 import ChatBar from './components/ChatBar.vue'
+import teamInvite from './components/teamInvite.vue'
+import socketioService from './services/socketio.service'
 import { ref } from 'vue'
 // import { chat } from './store/chat'
 export default {
@@ -20,13 +23,15 @@ export default {
   data() {
     return {
       sideBarOpen: false,
-      chatOpen: ref(false)
+      chatOpen: ref(false),
+      inviteOpen: false
   }
   },
   components: {
     NavBar,
     RightSideBar,
-    ChatBar
+    ChatBar,
+    teamInvite
   },
   methods: {
     RightSideChatOpen() {
@@ -38,8 +43,11 @@ export default {
                     this.chatOpen = true
                      })
       }
-    }
-}
+    },
+  },
+created() {
+        socketioService.setupSocketConnection()
+    },
 }
 </script>
 
