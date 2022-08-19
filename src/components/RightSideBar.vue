@@ -32,7 +32,7 @@
         >
         <button id="profile-button" v-show="thisFriendUser.username == friend.username" @click="goToProfile"><font-awesome-icon icon="user" /></button>
         <div class="invite-button-class">
-        <button id="invite-button-add" v-show="thisFriendUser.username == friend.username && thisFriendUser.teamInviteSend == false && thisFriendUser.isInTeam == false" @click="addToPending() ; sendInviteSocket()"><font-awesome-icon icon="envelope" /></button>
+        <button id="invite-button-add" v-show="thisFriendUser.username == friend.username && thisFriendUser.teamInviteSend == false && thisFriendUser.isInTeam == false && thisCurrentUser.isInTeam == true" @click="addToPending() ; sendInviteSocket()"><font-awesome-icon icon="envelope" /></button>
         <button id="invite-button-remove" v-show="thisFriendUser.username == friend.username && thisFriendUser.teamInviteSend == true" @click="removeFromPending(); deleteInviteSocket()"><font-awesome-icon icon="rectangle-xmark" /></button>
         </div>
         <button id="chat-button" v-show="thisFriendUser.username == friend.username" @click="createConversation()"><font-awesome-icon icon="comment" /></button>

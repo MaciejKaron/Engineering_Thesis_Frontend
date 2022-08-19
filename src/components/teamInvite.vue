@@ -100,7 +100,7 @@ export default {
             teamService.confirmTeamInvitation(this.thisCurrentUser._id, data)
                 .then(response => {
                     console.log(response)
-                this.goToYourTeam()
+                this.reloadPage()
                 })
             .catch(e => {
                 console.log(e);
@@ -121,21 +121,25 @@ export default {
         },
 
         sendInfoSocketConfirm() {
-            const receiverId = this.invite[0].sender
-            socketioService.socket.emit("sendInfo", {
-                receiverId,
-                teamInviteSend: false,
-                isInTeam: true,
-                newPlayer: this.thisCurrentUser._id
-            })   
+            for (var i = 0; i < this.teamName.players.length; i++) {
+                const receiverId = this.teamName.players[i]
+                socketioService.socket.emit("sendInfo", {
+                    receiverId,
+                    teamInviteSend: false,
+                    isInTeam: true,
+                    newPlayer: this.thisCurrentUser._id
+                })
+            }
         },
         sendInfoSocketDecline() {
-            const receiverId = this.invite[0].sender
-            socketioService.socket.emit("sendInfo", {
-                receiverId,
-                teamInviteSend: false,
-                isInTeam: false
-            })   
+            for (var i = 0; i < this.teamName.players.length; i++) {
+                const receiverId = this.teamName.players[i]
+                socketioService.socket.emit("sendInfo", {
+                    receiverId,
+                    teamInviteSend: false,
+                    isInTeam: false
+                })
+            }
         },
 
         goToYourTeam() {

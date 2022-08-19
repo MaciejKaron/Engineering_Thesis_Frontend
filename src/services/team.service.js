@@ -14,6 +14,10 @@ class TeamService {
         return axios.get(API_URL + `team/find/all?name=${searchName}`)
     }
 
+    getAllTeams() {
+        return axios.get(API_URL + `team/get/all`)
+    }
+
     deleteTeam(id) {
         return axios.delete(API_URL + `team/${id}`)
     }

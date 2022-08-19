@@ -13,6 +13,7 @@ const Friends = () => import("./views/Friends.vue")
 const UserProfile = () => import("./views/UserProfile")
 const Team = () => import("./views/Team")
 const myTeam = () => import("./views/myTeam")
+const TeamProfile = () => import("./views/TeamProfile")
 
 const routes = [
     {
@@ -92,6 +93,12 @@ const routes = [
         //lazy-loaded
         component: myTeam,
     },
+    {
+        path: "/team/profile/:id",
+        name: "TeamProfile",
+        //lazy-loaded
+        component: TeamProfile
+    }
       
 ]
 

@@ -1,7 +1,7 @@
 <template>
 <div class="chatButton-switch" v-if="currentUser">
 <div class="chatButton" v-if="!$props.openChat">
-    <button id="chatB" @click="$emit('toggleChat')"><font-awesome-icon size="2x" icon="comment-dots" /></button>
+    <button id="chatB" :class="{'noNotification': !marker, 'notification': marker}" @click="$emit('toggleChat')"><font-awesome-icon size="2x" icon="comment-dots" /></button>
 </div>
 </div>
 <div class="chatbar" v-if="$props.openChat">
@@ -19,7 +19,7 @@
                 <p>Conversations</p>
                 <ul>
                     <li 
-                    :class="{ active: index == currentIndex}" 
+                    :class="{ active: index == currentIndex, 'noNotification': markerId != friend._id, 'notification': markerId == friend._id }" 
                     v-for="(friend,index) in conversationFriends"
                     :key="index"
                     @click="setActiveConversation(friend, index)">
@@ -54,7 +54,7 @@
                     <div class="col-12">
                         <div class="message-area">
                         <div class="message-a">
-                            <textarea class="form-control" id="text-area" v-model="newMessage" rows="3" placeholder="Your message ..."></textarea>
+                            <textarea class="form-control" id="text-area" v-model="newMessage" rows="3" placeholder="Your message ..." @click="resetMarker()"></textarea>
                         </div>
                         <div class="button-a">
                             <button class="send-message" @click="createMessage(); sendMessageSocket()">Send</button>
@@ -98,7 +98,9 @@ export default {
             currentIndex: -1,
             socket: null,
             arrivalMessage: [],
-            receivedId: null
+            receivedId: null,
+            marker: false,
+            markerId: null
         }
     },
     methods: {
@@ -187,6 +189,10 @@ export default {
             this.thisUser = friend
              this.currentIndex = index
              this.getCurrentChat(this.thisUser._id, this.currentUser._id)
+             if (this.thisUser._id == this.markerId) {
+                 this.markerId = null
+                 this.marker = false
+             }
         },
 
         getMessages(id) {
@@ -231,7 +237,9 @@ export default {
                 senderId: this.currentUser._id,
                 receiverId,
                 text: this.newMessage,
-                createdAt: this.messageDate
+                createdAt: this.messageDate,
+                marker: true,
+                markerId: this.thisCurrentUser._id
             })
         },
 
@@ -240,12 +248,18 @@ export default {
                 this.messages.push({
                     sender: data.senderId,
                     text: data.text,
-                    createdAt: data.createdAt
+                    createdAt: data.createdAt,
+                    marker: data.marker,
+                    markerId: data.markerId
                 })   
-                this.$nextTick(function () {
-            var container = document.querySelector(".row.h-70")
-            container.scrollTop = container.scrollHeight
-          })        
+                this.marker = data.marker
+                this.markerId = data.markerId
+                if (this.$props.openChat) {
+                    this.$nextTick(function () {
+                        var container = document.querySelector(".row.h-70")
+                        container.scrollTop = container.scrollHeight
+                    })
+                }       
             })
         },
         changeArrays() {
@@ -270,6 +284,12 @@ export default {
             var container = document.querySelector(".row.h-70")
             container.scrollTop = container.scrollHeight
             // document.getElementById("messages-column").scrollIntoView({ behavior: 'smooth', block: 'end' })
+        },
+        resetMarker() {
+          if (this.thisUser._id == this.markerId) {
+                 this.markerId = null
+                 this.marker = false
+             }  
         },
         log(message) {
             console.log(message)
@@ -417,6 +437,10 @@ display: inline-block;
 .data{
     font-size: 12px;
     color: rgb(44, 44, 44);
+}
+
+.notification{
+  color: rgb(251, 65, 65);
 }
 
 </style>

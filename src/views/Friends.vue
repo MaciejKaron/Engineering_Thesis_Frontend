@@ -36,7 +36,7 @@
         <div>
             <label><strong>Friends:</strong></label> {{thisUser.friends}}
         </div>
-        <button class="profile-button" @click="goToProfile">Profile</button>
+        <button class="profile-button" @click="goToProfile()">Profile</button>
         </div>
         <div>
             <br />

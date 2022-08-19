@@ -62,15 +62,25 @@
         <div>
             <label><strong>Premium:</strong></label> {{currentTournament.premium}}
         </div>
-        <div>
+        <div v-if="currentTournament.mode == '1v1'">
             <label><strong>Players:</strong></label> {{currentTournament.players}}
+        </div>
+        <div v-if="currentTournament.mode == '5v5'">
+            <label><strong>Teams:</strong></label> {{currentTournament.teams}}
         </div>
         <div>
             <label><strong>Start Time:</strong></label> {{displayDate(currentTournament.startTime)}} 
         </div>
-        <a class="badge badge-warning" :href="'tournament/edit/' + currentTournament._id">Edit</a>
-        <button class="join_button" @click="joinUserToTournament">JOIN</button>
-        <button class="leave_button" @click="rejoinUserFromTournament">LEAVE</button>
+        <div class="1v1" v-if="currentTournament.mode == '1v1'">
+            <a class="badge badge-warning" :href="'tournament/edit/' + currentTournament._id">Edit</a>
+            <button class="join_button" @click="joinUserToTournament()">JOIN</button>
+            <button class="leave_button" @click="rejoinUserFromTournament()">LEAVE</button>
+        </div>
+        <div class="5v5" v-if="currentTournament.mode == '5v5'">
+            <a class="badge badge-warning" :href="'tournament/edit/' + currentTournament._id">Edit</a>
+            <button class="join_button" @click="joinTeamToTournament()">JOIN</button>
+            <button class="leave_button" @click="rejoinTeamFromTournament()">LEAVE</button>
+        </div>
         </div>
         <div>
             <br />
@@ -115,7 +125,7 @@ export default {
             currentPage: 0,
             totalPages: null,
             totalItems: null,
-            thisUser: null,     
+            thisCurrentUser: null,     
         }
     },
     methods: {
@@ -136,7 +146,7 @@ export default {
             tournamentService.findAllPublishedTournaments(this.currentPage,this.searchTitle, this.pageSize)
                 .then((response) => {
             this.tournamentsPaginated = response.data
-                    console.log(response.data)
+                    // console.log(response.data)
                     this.totalPages = this.tournamentsPaginated.totalPages
                     this.tournaments = this.tournamentsPaginated.tournaments
                     this.totalItems = this.tournamentsPaginated.totalItems
@@ -199,7 +209,8 @@ export default {
         joinUserToTournament() {
             tournamentService.addUserToTournament(this.currentTournament._id, this.currentUser)
                 .then(response => {
-                console.log(response.data)
+                    console.log(response.data)
+                this.reloadPage()
                 })
                 .catch(e => {
                 console.log(e)
@@ -209,9 +220,38 @@ export default {
         rejoinUserFromTournament() {
             tournamentService.leaveUserFromTournament(this.currentTournament._id, this.currentUser)
                 .then(response => {
-            console.log(response.data)
+                    console.log(response.data)
+            this.reloadPage()
                 })  
                 .catch(e => {
+            console.log(e)
+          })
+        },
+
+        joinTeamToTournament() {
+            var data = {
+                _id: this.thisCurrentUser.team.toString()
+            }
+            tournamentService.addTeamToTournament(this.currentTournament._id, data)
+                .then(response => {
+                    console.log(response.data);
+            this.reloadPage()
+                })  
+          .catch(e => {
+            console.log(e)
+          })
+        },
+
+        rejoinTeamFromTournament() {
+            var data = {
+                _id: this.thisCurrentUser.team.toString()
+            }
+            tournamentService.leaveTeamFromTournament(this.currentTournament._id, data)
+                .then(response => {
+                    console.log(response.data);
+            this.reloadPage()
+                })  
+          .catch(e => {
             console.log(e)
           })
         },
@@ -219,8 +259,8 @@ export default {
         getOneUser(id) {
             userService.findOneUser(id)
                 .then(response => {
-                    this.thisUser = response.data
-                console.log(response.data)
+                    this.thisCurrentUser = response.data
+                // console.log(response.data)
                 })
                 .catch(e => {
                 console.log(e)
@@ -233,10 +273,14 @@ export default {
         },
         log(message) {
             console.log(message)
-        }
+        },
+        reloadPage() {
+      window.location.reload();
+        },
     },
     mounted() {
         this.getAllPublishedTournaments()
+        this.getOneUser(this.currentUser._id)
     },
     computed: {
         currentUser() {

@@ -14,12 +14,37 @@
         <li v-if="showModeratorBoard" class="nav-item">
           <router-link to="/mod" class="nav-link">Moderator Board</router-link>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <router-link v-if="currentUser" to="/user" class="nav-link">User</router-link>
-        </li>
+        </li> -->
         <li class="nav-item">
           <router-link v-if="currentUser" to="/premium" class="nav-link">Premium</router-link>
         </li>
+        <!-- SEARCHBAR -->
+        <div class="searchBar">
+        <input class="searcher" type="text" id="search" placeholder="Search ..." v-model="searchName" />
+        <div class="search-list" v-if="searchName !== ''">
+        <div v-if="searchName !== '' && searchUsers.length == 0 ">Nothink found</div>
+        <div v-if="searchName !== '' && searchUsers.length > 0">Users:</div>
+        <ul>
+          <li class="users-list"
+              :class="{ active: index == currentIndex}"
+              v-for="(user, index) in searchUsers" :key="index"
+              @click="setActiveUser(user,index)">
+                {{user.username}}
+          </li>
+        </ul>
+        <div v-if="searchName !== '' && searchTeams.length > 0">Teams:</div>
+        <ul>
+          <li class="teams-list"
+              :class="{ active: index == currentIndex}"
+              v-for="(team, index) in searchTeams" :key="index"
+              @click="setActiveTeam(team,index)">
+                {{team.name}}
+          </li>
+        </ul>
+        </div>
+        </div>
       </div>
       <div v-if="!currentUser" class="navbar-nav ml-auto">
         <li class="nav-item">
@@ -58,10 +83,9 @@
             {{ currentUser.username }}
           </router-link>
         </li>
-        <li>
-          <div class="nav-link" id="friends">
-            <font-awesome-icon icon="bell" />
-            
+        <li class="nav-item" @click="$emit('toggleNotifications')">
+          <div class="nav-link" id="friends" >
+            <font-awesome-icon icon="bell"  :class="{'noNotification': !marker, 'notification': marker}"  />
           </div>
         </li>
         <li class="nav-item">
@@ -75,29 +99,22 @@
 </template>
 
 <script>
+import userService from '@/services/user.service';
+import teamService from '@/services/team.service';
+import socketioService from '@/services/socketio.service';
 export default {
     name: "NavBar-comp",
     data() {
         return {
-            
+          searchName: "",
+          allUsers: [],
+          allTeams: [],
+          thisUser: null,
+          thisTeam: null,
+          currentIndex: -1,
+          notifications: [],
+          marker: false,
         }
-    },
-  computed: {
-    currentUser() {
-      return this.$store.state.auth.user;
-    },
-    showAdminBoard() {
-      if (this.currentUser && this.currentUser['roles']) {
-        return this.currentUser['roles'].includes('ROLE_ADMIN');
-      }
-      return false;
-    },
-    showModeratorBoard() {
-      if (this.currentUser && this.currentUser['roles']) {
-        return this.currentUser['roles'].includes('ROLE_MODERATOR');
-      }
-      return false;
-    }
   },
   methods: {
     logOut() {
@@ -122,11 +139,100 @@ export default {
         var navBar = document.querySelector(".navBar")
         navBar.classList.toggle("sticky", window.scrollY)
       })
-    }
+    },
+
+    getAllUsers() {
+      userService.getAllUsers()
+        .then(response => {
+          this.allUsers = response.data
+        })
+      .catch(e => {
+            console.log(e)
+        })
+    },
+
+    getAllTeams() {
+      teamService.getAllTeams()
+        .then(response => {
+        this.allTeams = response.data
+        })
+      .catch(e => {
+            console.log(e)
+        })
+    },
+    setActiveUser(user, index) {
+            this.thisUser = user
+            this.currentIndex = index
+      // console.log(this.thisUser)
+      this.goToProfile()
+            this.searchName = ""
+    },
+
+    goToProfile() {
+          this.$router.push({name:'UserProfile', params: {id: this.thisUser._id}});
+    },
+
+    setActiveTeam(team, index) {
+      this.thisTeam = team
+      this.currentIndex = index
+      // console.log(this.thisTeam);
+      this.goToTeamProfile()
+      this.searchName = ""
+    },
+    goToTeamProfile() {
+        this.$router.push({name:'TeamProfile', params: {id: this.thisTeam._id}})
+    },
+
+    getNotificationSocket() {
+      socketioService.socket.on("getNotification", (data) => {
+        this.notifications = []
+        this.notifications.push({
+          marker: data.marker
+        })
+        this.marker = data.marker
+      })
+    },
+  },
+  computed: {
+    currentUser() {
+      return this.$store.state.auth.user;
+    },
+    showAdminBoard() {
+      if (this.currentUser && this.currentUser['roles']) {
+        return this.currentUser['roles'].includes('ROLE_ADMIN');
+      }
+      return false;
+    },
+    showModeratorBoard() {
+      if (this.currentUser && this.currentUser['roles']) {
+        return this.currentUser['roles'].includes('ROLE_MODERATOR');
+      }
+      return false;
+    },
+    searchUsers() {
+      if (this.searchName === '') {
+        return []
+      }
+      return this.allUsers.filter(user => {
+        return user.username.toLowerCase().indexOf(this.searchName.toLowerCase()) != -1
+      })
+    },
+    searchTeams() {
+      if (this.searchName === '') {
+        return []
+      }
+
+      return this.allTeams.filter(team => {
+         return team.name.toLowerCase().indexOf(this.searchName.toLowerCase()) != -1 
+        })
+    },
   },
   mounted() {
     // this.stickyNavbar()
     this.test()
+    this.getAllUsers()
+    this.getAllTeams()
+    this.getNotificationSocket()
   },
 };
 </script>
@@ -151,4 +257,40 @@ export default {
 #friends {
   cursor: pointer;
 }
+
+.searcher{
+  margin-left: 1em;
+ max-width: 16em;
+ max-height: 4em;
+ height: 2em;
+ width: 14em;
+ border-radius: 15px;
+ border-color: black;
+ text-align: center;
+}
+
+.search-list{
+  position: absolute;
+  margin-top: 1em;
+  margin-left: 1em;
+  border-radius: 5px;
+  background-color: rgb(208, 208, 208);
+  height: 10em;
+  width: 14em;
+  z-index: 50;
+  overflow: auto;
+}
+
+.users-list{
+  cursor: pointer;
+}
+
+.teams-list{
+  cursor: pointer;
+}
+
+.notification{
+  color: rgb(251, 65, 65);
+}
+
 </style>

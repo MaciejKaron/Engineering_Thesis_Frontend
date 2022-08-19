@@ -42,6 +42,14 @@ class TournamentService {
     leaveUserFromTournament(id, data) {
         return axios.post(API_URL + `tournaments/rejoin/${id}`, data)
     }
+
+    addTeamToTournament(id, data) {
+        return axios.post(API_URL + `tournaments/joinTeam/${id}`, data)
+    }
+
+    leaveTeamFromTournament(id, data) {
+        return axios.post(API_URL + `tournaments/rejoinTeam/${id}`, data)
+    }
 }
 
 export default new TournamentService()

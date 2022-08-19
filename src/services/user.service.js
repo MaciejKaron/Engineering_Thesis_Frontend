@@ -32,6 +32,10 @@ class UserService {
         return axios.get(API_URL2 + `user/find/all?username=${searchName}`)
     }
 
+    getAllUsers() {
+        return axios.get(API_URL2 + `user/get/all`)
+    }
+
     addToPending(id, data) {
         return axios.post(API_URL2 + `user/friend/${id}`, data)
     }
