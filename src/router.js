@@ -1,9 +1,12 @@
 import { createWebHistory, createRouter } from "vue-router";
-import Home from "./components/Home.vue";
-import Login from "./components/Login.vue";
-import Register from "./components/Register.vue";
+// import Home from "./components/Home.vue";
+// import Login from "./components/Login.vue";
+// import Register from "./components/Register.vue";
 // lazy-loaded
-const Profile = () => import("./components/Profile.vue")
+const Login = () => import("./views/Login.vue")
+const Register = () => import("./views/Register.vue")
+const Home = () => import("./views/Home.vue")
+const Profile = () => import("./views/Profile.vue")
 const BoardAdmin = () => import("./views/BoardAdmin.vue")
 const BoardModerator = () => import("./components/BoardModerator.vue")
 const BoardUser = () => import("./components/BoardUser.vue")
@@ -14,6 +17,7 @@ const UserProfile = () => import("./views/UserProfile")
 const Team = () => import("./views/Team")
 const myTeam = () => import("./views/myTeam")
 const TeamProfile = () => import("./views/TeamProfile")
+const Ranking = () => import("./views/Ranking")
 
 const routes = [
     {
@@ -98,7 +102,13 @@ const routes = [
         name: "TeamProfile",
         //lazy-loaded
         component: TeamProfile
-    }
+    },
+    {
+        path: "/ranking",
+        name: "ranking",
+        //lazy-loaded
+        component: Ranking,
+    },
       
 ]
 

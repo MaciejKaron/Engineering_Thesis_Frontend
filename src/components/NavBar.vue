@@ -18,10 +18,19 @@
           <router-link v-if="currentUser" to="/user" class="nav-link">User</router-link>
         </li> -->
         <li class="nav-item">
-          <router-link v-if="currentUser" to="/premium" class="nav-link">Premium</router-link>
+          <router-link v-if="currentUser" to="/premium" class="nav-link">
+            <font-awesome-icon icon="crown" />
+            Premium
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/ranking" class="nav-link">
+            <font-awesome-icon icon="ranking-star" />
+            Ranking
+          </router-link>
         </li>
         <!-- SEARCHBAR -->
-        <div class="searchBar">
+        <div class="searchBar" v-if="currentUser">
         <input class="searcher" type="text" id="search" placeholder="Search ..." v-model="searchName" />
         <div class="search-list" v-if="searchName !== ''">
         <div v-if="searchName !== '' && searchUsers.length == 0 ">Nothink found</div>
@@ -65,12 +74,12 @@
           Team
         </router-link>
       </li>
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <router-link to="/friends" class="nav-link">
          <font-awesome-icon icon="magnifying-glass" />
           Search Friends
         </router-link>
-      </li>
+      </li> -->
       <li class="nav-item" @click="$emit('toggleBar')">
       <div class="nav-link" id="friends">
         <font-awesome-icon icon="handshake" />

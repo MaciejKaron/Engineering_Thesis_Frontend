@@ -1,10 +1,10 @@
 <template>
  <div id="app">
    <NavBar @toggleBar="sideBarOpen = !sideBarOpen" @toggleNotifications="notificationsOpen = !notificationsOpen" />
-   <RightSideBar @toggleBar="sideBarOpen = !sideBarOpen" :open="sideBarOpen" @toggleChat=RightSideChatOpen() />
-   <ChatBar @toggleChat="chatOpen = !chatOpen" :openChat="chatOpen" />
-   <teamInvite @toggleInvite="inviteOpen = true" @toggleInviteClose="inviteOpen = false" :open="inviteOpen" />
-   <Notifications @toggleNotifications="notificationsOpen = !notificationsOpen" :open="notificationsOpen" />
+   <RightSideBar v-if="loggedIn" @toggleBar="sideBarOpen = !sideBarOpen" :open="sideBarOpen" @toggleChat=RightSideChatOpen() />
+   <ChatBar v-if="loggedIn" @toggleChat="chatOpen = !chatOpen" :openChat="chatOpen" />
+   <teamInvite v-if="loggedIn" @toggleInvite="inviteOpen = true" @toggleInviteClose="inviteOpen = false" :open="inviteOpen" />
+   <Notifications v-if="loggedIn" @toggleNotifications="notificationsOpen = !notificationsOpen" :open="notificationsOpen" />
 
     <div class="container">
       <router-view :key="$route.path"/>
@@ -49,9 +49,17 @@ export default {
                      })
       }
     },
+    reloadPage() {
+      window.location.reload();
+        },
   },
 created() {
         socketioService.setupSocketConnection()
+  },
+    computed: {
+        loggedIn() {
+            return this.$store.state.auth.status.loggedIn;
+        },
     },
 }
 </script>

@@ -148,7 +148,8 @@ export default {
         addUserSocket() {
             // socketioService.socket.emit("addUser", this.currentUser._id);  //duplicate in chatBar
             socketioService.socket.on("getUsers", (users) => {
-                this.onlineUsers = this.thisCurrentUser.friends.filter(f => users.some(u => u.userId === f));
+                // this.onlineUsers = this.thisCurrentUser.friends.filter(f => users.some(u => u.userId === f)); git wersja
+                this.onlineUsers = this.currentUser.friends.filter(f => users.some(u => u.userId === f));
                 // console.log(this.onlineUsers)
             });
         },
