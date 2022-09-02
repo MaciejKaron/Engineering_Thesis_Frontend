@@ -22,6 +22,10 @@ class FaceitService {
     getVerifiedUsers() {
         return axios.get(API_URL + 'faceit/verified')
     }
+
+    getRankingStats() {
+        return axios.get(API_URL + 'faceit/ranking')
+    }
 }
 
 export default new FaceitService

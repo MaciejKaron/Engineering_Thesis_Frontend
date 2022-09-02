@@ -13,6 +13,7 @@
     "@fortawesome/vue-fontawesome": "^3.0.0-5",
     "@mdi/font": "5.9.55",
     "@popperjs/core": "^2.11.5",
+    "@vue-stripe/vue-stripe": "^4.4.4",
     "@vuepic/vue-datepicker": "^3.2.2",
     "axios": "^0.27.2",
     "bootstrap": "^5.1.3",

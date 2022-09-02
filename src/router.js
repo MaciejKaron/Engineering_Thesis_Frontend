@@ -18,6 +18,7 @@ const Team = () => import("./views/Team")
 const myTeam = () => import("./views/myTeam")
 const TeamProfile = () => import("./views/TeamProfile")
 const Ranking = () => import("./views/Ranking")
+const PremiumSuccess = () => import("./views/PremiumSuccess")
 
 const routes = [
     {
@@ -108,6 +109,13 @@ const routes = [
         name: "ranking",
         //lazy-loaded
         component: Ranking,
+    },
+
+    {
+        path: "/premium/success",
+        name: "success",
+        //lazy-loaded
+        component: PremiumSuccess,
     },
       
 ]

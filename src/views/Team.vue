@@ -101,7 +101,7 @@ export default {
                     this.team.id = response.data._id
                     // console.log(response.data._id)
                     // this.$router.push({ name: 'myTeam', params: { id: response.data._id } })
-                    this.reloadPage()
+                    this.getOneUser(this.thisCurrentUser._id)
                     this.submitted = true
                 
                 })
@@ -199,7 +199,7 @@ export default {
                 .then(response => {
                     console.log(response.data)
                  this.submitted = false
-                this.team = {}
+                    this.team = {}
                 })
                 .catch(e => {
                 console.log(e)

@@ -18,6 +18,11 @@
             <Field name="password" type="password" class="form-control" />
             <ErrorMessage name="password" class="error-feedback" />
           </div>
+          <div class="form-group">
+            <label for="repeatPassword">Repeat password</label>
+            <Field name="repeatPassword" type="password" class="form-control" />
+            <ErrorMessage name="repeatPassword" class="error-feedback" />
+          </div>
 
           <div class="form-group">
             <button class="btn btn-primary btn-block" :disabled="loading">
@@ -69,6 +74,10 @@ export default {
         .required("Password is required!")
         .min(6, "Must be at least 6 characters!")
         .max(40, "Must be maximum 40 characters!"),   
+      repeatPassword: yup
+            .string()
+            .required("Repeat your password")
+            .oneOf([yup.ref('password'), null], 'Password must match')
         })
         return {
             successful: false,

@@ -24,7 +24,7 @@
           </router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/ranking" class="nav-link">
+          <router-link v-if="currentUser" to="/ranking" class="nav-link">
             <font-awesome-icon icon="ranking-star" />
             Ranking
           </router-link>
@@ -93,7 +93,7 @@
           </router-link>
         </li>
         <li class="nav-item" @click="$emit('toggleNotifications')">
-          <div class="nav-link" id="friends" >
+          <div class="nav-link" id="notifications" >
             <font-awesome-icon icon="bell"  :class="{'noNotification': !marker, 'notification': marker}"  />
           </div>
         </li>
@@ -300,6 +300,10 @@ export default {
 
 .notification{
   color: rgb(251, 65, 65);
+}
+
+#notifications{
+  cursor: pointer;
 }
 
 </style>

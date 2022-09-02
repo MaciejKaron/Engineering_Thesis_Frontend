@@ -1,23 +1,44 @@
 <template>
     <h2 class="title">Global Ranking</h2>
+    <div class="your-stats">
+        <h4>Your stats:</h4>
+        <p v-if="thisCurrentUser.faceitVerified == true">Skill level: {{myStats.skill_level}} Elo: {{myStats.faceit_elo}}</p>
+        <p v-if="thisCurrentUser.faceitVerified == false"> Please bind your account with faceit</p>
+    </div>
     <div class="ranking">
-        <table class="table table-bordered table-striped">
+        <table class="table table-bordered table-striped" v-if="loaded == true">
             <thead>
                 <tr>
-                    <th v-for="field in fields" :key="field">
-                        {{field}} <font-awesome-icon icon="sort-down" />
+                    <th>
+                        RANKING 
+                    </th>
+                    <th>
+                        NICKNAME 
+                    </th>
+                    <th id="col-skill_level" @click="sortList('skill_level')">
+                        SKILL_LEVEL 
+                        <font-awesome-icon  icon="sort" />
+                    </th>
+                    <th id="col-faceit_elo" @click="sortList('faceit_elo')">
+                        ELO 
+                        <font-awesome-icon icon="sort" />
                     </th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(user,index) in verifiedUsers" :key="user">
+                <tr v-for="(stats, index) in rankingStats" :key="stats">
                     <td >
-                        {{index +1}}
+                        {{index + 1}}
                     </td>
                     <td>
-                        {{user.username}}
+                        {{ stats.nickname}}
                     </td>
-                    
+                    <td>
+                        {{stats.skill_level}}
+                    </td>
+                    <td>
+                        {{stats.faceit_elo}}
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -26,13 +47,17 @@
 
 <script>
 import faceitService from '@/services/faceit.service'
+import userService from '@/services/user.service'
 export default {
     name: "Ranking-comp",
     data() {
         return {
             verifiedUsers: [],
-            thisUserInfo: [],
-            thisStats: [],
+            rankingStats: [],
+            loaded: false,
+            sortedByAscii: true,
+            thisCurrentUser: [],
+            myStats: [],
             fields: ["RANKING", "PLAYER", "SKILL_LEVEL", "ELO"]
         }
     },
@@ -45,15 +70,39 @@ export default {
                 // console.log(this.verifiedUsers);
             })
         },
+        getRankingStats() {
+            faceitService.getRankingStats()
+                .then(response => {
+                    this.rankingStats = response.data
+                    this.loaded = true
+            console.log(this.rankingStats);
+          })  
+        },
+        sortList(sortBy) {
+            if (this.sortedByAscii) {
+                this.rankingStats.sort((x, y) => (x[sortBy] > y[sortBy] ? -1 : 1))
+                this.sortedByAscii = false
+            } else {
+                this.rankingStats.sort((x, y) => (x[sortBy] < y[sortBy] ? -1 : 1))
+                this.sortedByAscii = true
+            }
+        },
+        getCurrentUser(id) {
+            userService.findOneUser(id)
+                .then(response => {
+                    this.thisCurrentUser = response.data
+
+                    if (this.thisCurrentUser.faceitVerified == true) {
+                    this.getMyFaceitStats(this.thisCurrentUser._id)
+                }
+            })
+        },
         getMyFaceitStats(id) {
             faceitService.getMyFaceitStats(id)
                 .then(response => {
-                this.thisUserInfo = response.data
-                    this.thisStats = response.data.games.csgo
-                // console.log(this.thisUserInfo);
-                // console.log(this.thisStats);
-        })
-    },
+                this.myStats = response.data.games.csgo
+            })
+        },
     },
     computed: {
         currentUser() {
@@ -62,6 +111,8 @@ export default {
     },
     mounted() {
         this.getVerifiedUsers()
+        this.getRankingStats()
+        this.getCurrentUser(this.currentUser._id)
     },
 }
 </script>
@@ -69,5 +120,13 @@ export default {
 <style scoped>
 .title{
     text-align: center;
+}
+
+#col-skill_level{
+    cursor: pointer;
+}
+
+#col-faceit_elo{
+    cursor: pointer;
 }
 </style>

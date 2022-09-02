@@ -73,12 +73,12 @@
         </div>
         <div class="1v1" v-if="currentTournament.mode == '1v1'">
             <a class="badge badge-warning" :href="'tournament/edit/' + currentTournament._id">Edit</a>
-            <button class="join_button" @click="joinUserToTournament()">JOIN</button>
+            <button class="join_button" @click="joinUserToTournament()">JOIN SOLO</button>
             <button class="leave_button" @click="rejoinUserFromTournament()">LEAVE</button>
         </div>
         <div class="5v5" v-if="currentTournament.mode == '5v5'">
             <a class="badge badge-warning" :href="'tournament/edit/' + currentTournament._id">Edit</a>
-            <button class="join_button" @click="joinTeamToTournament()">JOIN</button>
+            <button class="join_button" @click="joinTeamToTournament()">JOIN WITH TEAM</button>
             <button class="leave_button" @click="rejoinTeamFromTournament()">LEAVE</button>
         </div>
         </div>
@@ -210,7 +210,7 @@ export default {
             tournamentService.addUserToTournament(this.currentTournament._id, this.currentUser)
                 .then(response => {
                     console.log(response.data)
-                this.reloadPage()
+                this.refreshList()
                 })
                 .catch(e => {
                 console.log(e)
@@ -221,7 +221,7 @@ export default {
             tournamentService.leaveUserFromTournament(this.currentTournament._id, this.currentUser)
                 .then(response => {
                     console.log(response.data)
-            this.reloadPage()
+            this.refreshList()
                 })  
                 .catch(e => {
             console.log(e)
@@ -230,12 +230,12 @@ export default {
 
         joinTeamToTournament() {
             var data = {
-                _id: this.thisCurrentUser.team.toString()
+                _id: this.thisCurrentUser._id.toString()
             }
             tournamentService.addTeamToTournament(this.currentTournament._id, data)
                 .then(response => {
                     console.log(response.data);
-            this.reloadPage()
+            this.refreshList()
                 })  
           .catch(e => {
             console.log(e)
@@ -249,7 +249,7 @@ export default {
             tournamentService.leaveTeamFromTournament(this.currentTournament._id, data)
                 .then(response => {
                     console.log(response.data);
-            this.reloadPage()
+            this.refreshList()
                 })  
           .catch(e => {
             console.log(e)

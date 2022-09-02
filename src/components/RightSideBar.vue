@@ -133,6 +133,7 @@ export default {
                 this.$watch("onlineUsers", () => {
                     this.findOnlineFriends();
                 });
+                this.findOnlineFriends();
             })
                 .catch(e => {
                 console.log(e);
@@ -149,7 +150,7 @@ export default {
             // socketioService.socket.emit("addUser", this.currentUser._id);  //duplicate in chatBar
             socketioService.socket.on("getUsers", (users) => {
                 // this.onlineUsers = this.thisCurrentUser.friends.filter(f => users.some(u => u.userId === f)); git wersja
-                this.onlineUsers = this.currentUser.friends.filter(f => users.some(u => u.userId === f));
+                this.onlineUsers = this.thisCurrentUser.friends.filter(f => users.some(u => u.userId === f));
                 // console.log(this.onlineUsers)
             });
         },
