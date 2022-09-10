@@ -1,23 +1,30 @@
 <template>
+    <div class="get-premium-box">
     <div class="get-premium">
-        <div>
-            <h2>Premium Account</h2>
-            <h3>Only 5$</h3>
-            <button v-if="thisUser.vip !== true" class="btn btn-warning" @click="payment()">GET PREMIUM</button>
+        <div class="premium">
+            <div class="premium-icons" v-if="thisUser.vip == true">
+            <font-awesome-icon id="icon-dolar" icon="dollar-sign" />
+            <font-awesome-icon id="icon-happy" icon="face-laugh-beam" />
+            <font-awesome-icon id="icon-dolar" icon="dollar-sign" />
+            </div>
+            <h2 class="premium-title">Premium Account</h2>
+            <h3 class="premium-price">Only 5$</h3>
+            <button v-if="thisUser.vip !== true" class="premium-button" @click="payment()">GET PREMIUM</button>
             <div class="premium-status">
             <label><strong>Status:</strong></label>
-            {{thisUser.vip ? "You have premium" : "You don't have premium"}}   
+            {{thisUser.vip ? "You already have premium!" : "You don't have premium"}}   
         </div>         
         </div>
     </div>
+    </div>
     <div class="main" v-if="showAdminBoard">
         <div class="child">
-        <h2>Admin free premium</h2>
-        <button class="btn btn-danger" v-if="thisUser.vip" @click="updateToPremium(false)">Resign</button>
-        <button class="btn btn-warning" v-else @click="updateToPremium(true)">Get Premium</button>
+        <h2 class="premium-title">Admin free premium</h2>
+        <button class="premium-button" v-if="thisUser.vip" @click="updateToPremium(false)">RESIGN</button>
+        <button class="premium-button" v-else @click="updateToPremium(true)">GET PREMIUM</button>
         <div class="premium-status">
             <label><strong>Status:</strong></label>
-            {{ thisUser.vip ? "You have premium" : "You don't have premium"}}
+            {{ thisUser.vip ? "You already have premium!" : "You don't have premium"}}
         </div>
         </div>
     </div>
@@ -88,29 +95,84 @@ export default {
     mounted() {
         this.message = "",
         this.getOneUser(this.currentUser._id)
-    }
+    },
+    created() {
+    document.body.style.backgroundColor = "#303033";
+  },
 }
 </script>
 
 <style scoped>
 .main {
-  margin: auto;
-  width: 50%;
-  border: 3px solid green;
-  padding: 10px;
-  align-items: center;
-  text-align: center;
-  margin-top: 5em;
+    color: white;
+    background-color: #1a1a1d;
+    width: 30em;
+    /* margin top,right,bottom,left */
+    margin-top: 6em;
+    margin-right: auto;
+    margin-bottom: 0;
+    margin-left: auto;
+     text-align: center; 
+     margin-top: 8em;
+     font-family: roboto;
+     /* border: 1px solid #950740; */
+     box-shadow: 0px 0px 10px 10px #950740;
 }
 
-.get-premium{
-    margin: auto;
-  width: 50%;
-  border: 3px solid green;
-  padding: 10px;
-  align-items: center;
-  text-align: center; 
+.get-premium-box{
+    color: white;
+    background-color: #1a1a1d;
+    width: 30em;
+    /* margin top,right,bottom,left */
+    margin-top: 6em;
+    margin-right: auto;
+    margin-bottom: 0;
+    margin-left: auto;
+     text-align: center; 
+     margin-top: 8em;
+     font-family: roboto;
+     /* border: 1px solid #950740; */
+     box-shadow: 0px 0px 10px 10px #950740;
 }
 
+.premium-title{
+    margin-bottom: 1em;
+}
+
+.premium-price{
+    margin-bottom: 1em;
+}
+
+.premium-button{
+    margin-bottom: 1em;
+}
+
+.premium-status{
+    margin-bottom: 1em;
+}
+
+.premium-button {
+  background-color: #6f2232;
+  color: white;
+  border: 2px solid #950740;
+  border-radius:5px;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px #c3073f) drop-shadow(0 0 8px #c3073f) ;
+  transition: .5s;
+}
+
+.premium-button:hover {
+  color: white;
+  background-color: #c3073f;
+  filter: drop-shadow(0 0 6px #950740);
+}
+
+#icon-happy{
+    height: 4em;
+}
+
+#icon-dolar{
+    height: 3em;
+}
 
 </style>

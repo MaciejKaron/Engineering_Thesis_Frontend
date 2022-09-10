@@ -1,4 +1,5 @@
 <template>
+    <transition name="notifications-transition">
     <div class="notifications" v-if="open">
         <div class="close">
             <button id="close-notifications" @click="$emit('toggleNotifications')">X</button>
@@ -14,6 +15,7 @@
             </li>
         </ul>
     </div>
+</transition>
 </template>
 
 <script>
@@ -124,11 +126,14 @@ export default {
 <style scoped>
 
 .notifications{
-    float: right;
+    position:fixed;
+    top: 7%;
+    right: 0;
+    transition: all 300ms ease-in-out;
+
    display: flex;
     justify-content: flex-start;
     /* align-items: center; */
-    position:static;
     flex-direction: column;
     width: 250px;
     height: calc(50vh - 56px);
@@ -157,5 +162,17 @@ export default {
 .notifications-list{
     cursor: pointer;
 }
+
+.notifications-transition-enter-from,
+.notifications-transition-leave-to{
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+.notifications-transition-enter-active
+.notifications-transition-leave-active{
+    transition: all 0.5s ease-out;
+}
+
 
 </style>

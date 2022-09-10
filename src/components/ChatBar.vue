@@ -4,11 +4,12 @@
     <button id="chatB" :class="{'noNotification': !marker, 'notification': marker}" @click="$emit('toggleChat')"><font-awesome-icon size="2x" icon="comment-dots" /></button>
 </div>
 </div>
+<transition name="chat-transition">
 <div class="chatbar" v-if="$props.openChat">
 <!-- if window chat opened - print all conversation friends -->
 {{getConversationFriends()}}
 {{newReceiverId()}}
-    <div class="container">
+    <div class="chat-container">
         <div class="row h-10">
             <div class="close-chat">
                 <button id="close" @click="$emit('toggleChat'); clearConvFriends()">X</button>
@@ -66,6 +67,7 @@
         </div>
     </div>
 </div>
+</transition>
 </template>
 
 <script>
@@ -161,16 +163,16 @@ export default {
             if (chat.myAllConversations.length > 0) {
                 for (var j = 0; j < chat.myAllConversations.length; j++) {
                     const friendId = chat.myAllConversations[j].members.find((m) => m !== this.currentUser._id)
-
+                    
                     userService.findOneUser(friendId)
                         .then(response => {
                             this.conversationFriend = response.data
                             if (this.conversationFriends.length < chat.myAllConversations.length) {
                                 this.conversationFriends.push(this.conversationFriend)
-                                this.getCurrentChat(this.receivedId, this.currentUser._id)
                                 this.$watch('receivedId', () => {
                                     this.getCurrentChat(this.receivedId, this.currentUser._id)
                                 })
+                                this.getCurrentChat(this.receivedId, this.currentUser._id)
                                 // console.log(chat.receiverId)
                             }
                         })
@@ -201,8 +203,7 @@ export default {
                     this.messages = response.data
                     //AFTER SELECT CURRENT CHAT - SCROLL TO BOTTOM
                     this.$nextTick(function () {
-                    var container = document.querySelector(".row.h-70")
-                    container.scrollTop = container.scrollHeight
+                        this.scrollToBottom()
                      })
             })
         },
@@ -214,11 +215,11 @@ export default {
             }  
             messageService.createMessage(data)
                 .then(response => {
-                    if (chat.myAllConversations.length <= 0) {
-                        this.getCurrentChat(this.thisUser._id, this.currentUser._id)
-                    } else {
-                        this.getCurrentChat(chat.receiverId, this.currentUser._id)
-                    }
+                    // if (chat.myAllConversations.length <= 0) {
+                    //     this.getCurrentChat(this.thisUser._id, this.currentUser._id)
+                    // } if (chat.myAllConversations.length > 0) {
+                    //     this.getCurrentChat(chat.receiverId, this.currentUser._id)
+                    // }
                     this.$watch('messages', () => {
                         this.scrollToBottom()
                     })
@@ -256,8 +257,7 @@ export default {
                 this.markerId = data.markerId
                 if (this.$props.openChat) {
                     this.$nextTick(function () {
-                        var container = document.querySelector(".row.h-70")
-                        container.scrollTop = container.scrollHeight
+                        this.scrollToBottom()
                     })
                 }       
             })
@@ -289,7 +289,12 @@ export default {
           if (this.thisUser._id == this.markerId) {
                  this.markerId = null
                  this.marker = false
-             }  
+            }  
+            if (chat.receiverId == this.markerId) {
+                this.markerId = null
+                this.marker = false
+            }
+            
         },
         log(message) {
             console.log(message)
@@ -320,15 +325,14 @@ export default {
 
 <style>
 .chatButton{
-    float: right;
+    position: fixed;
+    top: 42em;
+    right: 2em;
    display: flex;
     justify-content: flex-start;
     align-items: center;
-    position: absolute;
     width: 3em;
     height: 3em;
-    top: 42em;
-    right: 2em;
     background-color: rgb(184, 65, 186);  
     z-index: 20;
 }
@@ -339,16 +343,16 @@ export default {
 }
 
 .chatbar{
-   float: right;
-   display: flex;
-    justify-content: flex-start;
-    position: absolute;
-    width: 50em;
-    height: 25em;
+    position: fixed;
     top: 22em;
     right: 2em;
+   display: flex;
+    justify-content: flex-start;
+    width: 50em;
+    height: 25em;
     background-color: rgb(184, 65, 186);  
     z-index: 19; 
+    transition: all 300ms ease-in-out;
 }
 
 .close-chat{
@@ -394,8 +398,14 @@ export default {
     text-align: center;
 }
 
-.container{
+.chat-container{
     height: 100%;
+    width: 100%;
+    max-width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 .h-10{
@@ -441,6 +451,17 @@ display: inline-block;
 
 .notification{
   color: rgb(251, 65, 65);
+}
+
+.chat-transition-enter-from,
+.chat-transition-leave-to{
+    transform: translate3d(20px,20px, 20px);
+    opacity: 0;
+}
+
+.chat-transition-enter-active
+.chat-transition-leave-active{
+    transition: all 0.5s ease-out;
 }
 
 </style>

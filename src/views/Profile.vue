@@ -120,6 +120,12 @@ export default {
           this.thisStats = response.data.games.csgo
           // console.log(this.thisStats);
         })
+        .then(() => {
+          var data = {
+            faceitAvatar: this.thisUserInfo.avatar
+          }
+          userService.updateUser(this.thisCurrentUser._id, data)
+        })
     },
     getGameStats(id) {
       faceitService.getGameStats(id)
@@ -137,7 +143,9 @@ export default {
     },
     changeNickname() {
       var data = {
-        faceitVerified: false
+        faceitVerified: false,
+        faceitNickname: "",
+        faceitAvatar: ""
       }
       userService.updateUser(this.thisCurrentUser._id, data)
         .then(response => {

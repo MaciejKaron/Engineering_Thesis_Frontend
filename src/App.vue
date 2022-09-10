@@ -66,7 +66,10 @@ created() {
 
 <style>
 .container{
+  margin-top: 4em;
   max-width: 100%;
+  height: 100%
 }
+
 
 </style>

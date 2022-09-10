@@ -1,5 +1,6 @@
 <template>
-<div class="sidebar" v-if="open">
+    <transition name="smoth">
+<div ref="headRef" class="sidebar" v-if="open">
 <div class="close">
     <button id="close-sideBar" @click="$emit('toggleBar')">X</button>
 </div>
@@ -81,6 +82,7 @@
 </div>
 </div>
 </div> 
+</transition>
 </template>
 
 <script>
@@ -253,7 +255,7 @@ export default {
                 this.thisFriendUser.isInTeam = data.isInTeam
                 
             })
-        }
+        },
     },
     mounted() {
         this.getOneCurrentUser(this.currentUser._id);
@@ -272,11 +274,14 @@ export default {
 
 <style>
 .sidebar{
-    float: right;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    transition: all 300ms ease-in-out;
+
    display: flex;
     justify-content: flex-start;
     /* align-items: center; */
-    position: relative;
     flex-direction: column;
     width: 250px;
     height: calc(100vh - 56px);
@@ -286,6 +291,7 @@ export default {
      overflow-y: scroll;
      overflow-x: hidden;
 }
+
 
 #itemsv1 {
  display: flex;
@@ -340,4 +346,30 @@ export default {
     padding-left: 0px !important;
 }
 
+.smoth-enter-from,
+.smoth-leave-to{
+    transform: translateX(20px);
+    opacity: 0;
+}
+
+/* .smoth-enter-to{
+    opacity: 1;
+} */
+
+.smoth-enter-active
+.smoth-leave-active{
+    transition: all 0.5s ease-out;
+}
+
+/* .smoth-leave-from{
+    opacity: 1;
+}
+
+.smoth-leave-to{
+    opacity: 0;
+} */
+
+/* .smoth-leave-active{
+    transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+} */
 </style>

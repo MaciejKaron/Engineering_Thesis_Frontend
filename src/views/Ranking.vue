@@ -27,7 +27,7 @@
             </thead>
             <tbody>
                 <tr v-for="(stats, index) in rankingStats" :key="stats">
-                    <td >
+                    <td>
                         {{index + 1}}
                     </td>
                     <td>
@@ -114,11 +114,15 @@ export default {
         this.getRankingStats()
         this.getCurrentUser(this.currentUser._id)
     },
+    created() {
+    document.body.style.backgroundColor = "#303033";
+  },
 }
 </script>
 
 <style scoped>
 .title{
+    color: white;
     text-align: center;
 }
 
@@ -129,4 +133,24 @@ export default {
 #col-faceit_elo{
     cursor: pointer;
 }
+
+.your-stats{
+    color:white
+}
+
+.table{
+    color: white;
+    background-color: #1a1a1d;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #17171a;
+}
+table.table-bordered > thead > tr > th{
+    border:1px solid #950740;
+}
+table.table-bordered > tbody > tr > td{
+    border:1px solid #6f2232;
+}
+
 </style>
