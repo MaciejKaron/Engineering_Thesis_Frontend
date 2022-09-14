@@ -2,23 +2,25 @@
     <transition name="smoth">
 <div ref="headRef" class="sidebar" v-if="open">
 <div class="close">
-    <button id="close-sideBar" @click="$emit('toggleBar')">X</button>
+    <button id="close-sideBar" class="rightSideBarButton" @click="$emit('toggleBar')"><font-awesome-icon icon="rectangle-xmark" /></button>
 </div>
 
 <div class="sidebar-title">
-<h4 id="title">ONLINE FRIENDS</h4>    
+<h4 id="title">ONLINE FRIENDS:</h4>    
 </div> 
 <div class="friends-container"> 
     <div class="row">
         <div class="col">
 <div class="sidebar-elements">
   <ul class="list-group" id="RightSideBar-comp">
-            <li class="list-group-item" id="itemsv1"
+            <li class="list-item" id="itemsv1"
         :class="{ active: index == currentIndex}"
         v-for="(friend,index) in onlineFriends"
         :key="index"
         @click="setActiveUser(friend, index)"
         >
+        <img class="friend-avatar" v-if="friend.faceitAvatar != '' " :src="friend.faceitAvatar" />
+        <img class="friend-avatar" v-if="friend.faceitAvatar == '' || friend.faceitAvatar == undefinied " :src="require('@/assets/unknown.jpg')" />
         {{friend.username}}
         </li>
         </ul>
@@ -31,12 +33,12 @@
         v-for="(friend,index) in onlineFriends"
         :key="index"
         >
-        <button id="profile-button" v-show="thisFriendUser.username == friend.username" @click="goToProfile"><font-awesome-icon icon="user" /></button>
+        <button id="profile-button" class="rightSideBarButton" v-show="thisFriendUser.username == friend.username" @click="goToProfile"><font-awesome-icon icon="user" /></button>
         <div class="invite-button-class">
-        <button id="invite-button-add" v-show="thisFriendUser.username == friend.username && thisFriendUser.teamInviteSend == false && thisFriendUser.isInTeam == false && thisCurrentUser.isInTeam == true" @click="addToPending() ; sendInviteSocket()"><font-awesome-icon icon="envelope" /></button>
-        <button id="invite-button-remove" v-show="thisFriendUser.username == friend.username && thisFriendUser.teamInviteSend == true" @click="removeFromPending(); deleteInviteSocket()"><font-awesome-icon icon="rectangle-xmark" /></button>
+        <button id="invite-button-add" class="rightSideBarButton" v-show="thisFriendUser.username == friend.username && thisFriendUser.teamInviteSend == false && thisFriendUser.isInTeam == false && thisCurrentUser.isInTeam == true" @click="addToPending() ; sendInviteSocket()"><font-awesome-icon icon="envelope" /></button>
+        <button id="invite-button-remove" class="rightSideBarButton" v-show="thisFriendUser.username == friend.username && thisFriendUser.teamInviteSend == true" @click="removeFromPending(); deleteInviteSocket()"><font-awesome-icon icon="rectangle-xmark" /></button>
         </div>
-        <button id="chat-button" v-show="thisFriendUser.username == friend.username" @click="createConversation()"><font-awesome-icon icon="comment" /></button>
+        <button id="chat-button" class="rightSideBarButton" v-show="thisFriendUser.username == friend.username" @click="createConversation()"><font-awesome-icon icon="comment" /></button>
         </li>
         </ul>
         </div>
@@ -46,19 +48,21 @@
 </div>
 
 <div class="sidebar-title">
-<h4 id="title">ALL FRIENDS</h4>    
+<h4 id="title">ALL FRIENDS:</h4>    
 </div> 
 <div class="friends-container"> 
     <div class="row">
         <div class="col">
 <div class="sidebar-elements">
   <ul class="list-group" id="RightSideBar-comp">
-            <li class="list-group-item" id="itemsv1" 
+            <li class="list-item" id="itemsv1" 
         :class="{ active: index == currentIndex}"
         v-for="(friend,index,) in myAllFriendsWithoutOnline"
         :key="index"
         @click="setActiveUser(friend, index)"
         >
+        <img class="friend-avatar" v-if="friend.faceitAvatar != '' " :src="friend.faceitAvatar" />
+        <img class="friend-avatar" v-if="friend.faceitAvatar == '' || friend.faceitAvatar == undefinied " :src="require('@/assets/unknown.jpg')" />
         {{friend.username}}
         </li>
         </ul>
@@ -71,9 +75,9 @@
         v-for="(friend,index) in myAllFriendsWithoutOnline"
         :key="index"
         >
-        <button id="profile-button" v-show="thisFriendUser.username == friend.username" @click="goToProfile"><font-awesome-icon icon="user" /></button>
+        <button id="profile-button" class="rightSideBarButton" v-show="thisFriendUser.username == friend.username" @click="goToProfile"><font-awesome-icon icon="user" /></button>
         <!-- <button id="invite-button" v-show="thisFriendUser.username == friend.username" @click="addToPending() ; sendInviteSocket()"><font-awesome-icon icon="envelope" /></button> -->
-        <button id="chat-button" v-show="thisFriendUser.username == friend.username" @click="createConversation()"><font-awesome-icon icon="comment" /></button>
+        <button id="chat-button" class="rightSideBarButton" v-show="thisFriendUser.username == friend.username" @click="createConversation()"><font-awesome-icon icon="comment" /></button>
         </li>
         </ul>
         </div>
@@ -285,11 +289,16 @@ export default {
     flex-direction: column;
     width: 250px;
     height: calc(100vh - 56px);
-    padding-top: 12px;
-    background-color: rgb(106, 106, 179);  
+    padding-top: 12px; 
     z-index: 10;
      overflow-y: scroll;
      overflow-x: hidden;
+     background-color: #1a1a1d; 
+     color: white;
+     font-family: roboto;
+     -webkit-box-shadow:0px 1px 1px #950740;
+    -moz-box-shadow:0px 1px 1px #950740;
+    box-shadow:0px 0px 12px 1px white;
 }
 
 
@@ -302,8 +311,9 @@ export default {
       margin-bottom: 8px;
       margin-left: 0.2em;
       cursor: pointer;
-      color: #fefefe;
-      background-color: #242424;
+      color: white;
+      background-color: #1a1a1d;
+      border-bottom: 2px solid #c3073f;
 }
 
 #options {
@@ -314,7 +324,7 @@ export default {
       height: 50px;
       margin-bottom: 8px;
       color: #fefefe;
-      background-color: rgb(106, 106, 179);  
+      background-color: #1a1a1d;  
       margin-left: 1em;
       border: none !important;
 }
@@ -330,16 +340,21 @@ export default {
 #title{
     margin-bottom: 1em;
     text-align: center;
+    -webkit-box-shadow:0px 1px 1px #950740;
+ -moz-box-shadow:0px 1px 1px #950740;
+ box-shadow:0px 1px 12px #c3073f;
 }
 
 .close{
     width:100%;
+    color: white;
 }
 
 #close-sideBar{
     margin-bottom: 0.5em;
     margin-right: 0.5em;
     float: right;
+    color: white;
 }
 
 #buttons{
@@ -352,24 +367,36 @@ export default {
     opacity: 0;
 }
 
-/* .smoth-enter-to{
-    opacity: 1;
-} */
-
 .smoth-enter-active
 .smoth-leave-active{
     transition: all 0.5s ease-out;
 }
 
-/* .smoth-leave-from{
-    opacity: 1;
+.friend-avatar{ 
+  max-width: 2em;
+  max-height: 2em;
+  border-radius: 66px;
+  margin-right: 0.5em;
 }
 
-.smoth-leave-to{
-    opacity: 0;
-} */
+.rightSideBarButton {
+  background-color: #6f2232;
+  color: white;
+  border: 2px solid #950740;
+  border-radius:5px;
+  cursor: pointer;
+  filter: drop-shadow(0 0 2px #c3073f) drop-shadow(0 0 4px #c3073f) ;
+  transition: .5s;
+}
 
-/* .smoth-leave-active{
-    transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
-} */
+.rightSideBarButton:hover {
+  color: white;
+  background-color: #c3073f;
+  filter: drop-shadow(0 0 6px #950740);
+}
+
+.invite-button-class{
+    margin-left: 0.2em;
+}
+
 </style>

@@ -54,7 +54,9 @@ export default {
         },
   },
 created() {
-        socketioService.setupSocketConnection()
+  socketioService.setupSocketConnection()
+  
+  document.body.style.backgroundColor = "#303033"
   },
     computed: {
         loggedIn() {

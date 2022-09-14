@@ -108,12 +108,11 @@ export default {
     background-color: #1a1a1d;
     width: 30em;
     /* margin top,right,bottom,left */
-    margin-top: 6em;
+    margin-top: 8em;
     margin-right: auto;
     margin-bottom: 0;
     margin-left: auto;
-     text-align: center; 
-     margin-top: 8em;
+     text-align: center;
      font-family: roboto;
      /* border: 1px solid #950740; */
      box-shadow: 0px 0px 10px 10px #950740;

@@ -42,7 +42,7 @@
               v-for="(user, index) in searchUsers" :key="index"
               @click="setActiveUser(user,index)">
                 <img class="avatar" v-if="user.faceitAvatar != '' " :src="user.faceitAvatar" />
-                <img class="avatar" v-if="user.faceitAvatar == '' " :src="require('@/assets/unknown.jpg')" />
+                <img class="avatar" v-if="user.faceitAvatar == '' || user.faceitAvatar == undefinied " :src="require('@/assets/unknown.jpg')" />
                  {{user.username}}
           </li>
         </ul>

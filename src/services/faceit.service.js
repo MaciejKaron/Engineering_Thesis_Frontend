@@ -26,6 +26,10 @@ class FaceitService {
     getRankingStats() {
         return axios.get(API_URL + 'faceit/ranking')
     }
+
+    getPlayerHistory(id) {
+        return axios.get(API_URL + `faceit/history/${id}`)
+    }
 }
 
 export default new FaceitService

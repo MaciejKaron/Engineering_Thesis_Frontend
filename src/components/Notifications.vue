@@ -2,18 +2,20 @@
     <transition name="notifications-transition">
     <div class="notifications" v-if="open">
         <div class="close">
-            <button id="close-notifications" @click="$emit('toggleNotifications')">X</button>
+            <button id="close-notifications" class="customButton" @click="$emit('toggleNotifications')"><font-awesome-icon icon="rectangle-xmark" /></button>
         </div>
         <h4 id="notification-title">Notifications</h4>
         <div class="notifications-empty" v-if="allNotifications.length == 0">You don't have any notifications</div>
-        <ul>
-            <li class="notifications-list" 
+        <div>
+            <div class="notifications-list" 
                 :class="{ active: index == currentIndex}"
                 v-for="(notification,index) in allNotifications" :key="index"
                 @click="setActiveNotification(notification,index)">
-                {{notification.senderName}} invite you to friends!
-            </li>
-        </ul>
+                <div class="notification-txt">
+                    {{notification.senderName}} invite you to friends!
+                </div>
+            </div>
+        </div>
     </div>
 </transition>
 </template>
@@ -137,11 +139,36 @@ export default {
     flex-direction: column;
     width: 250px;
     height: calc(50vh - 56px);
-    padding-top: 12px;
-    background-color: rgb(161, 85, 227);  
+    padding-top: 12px; 
     z-index: 11;
      overflow-y: scroll;
      overflow-x: hidden;
+     background-color: #1a1a1d; 
+     color: white;
+     font-family: roboto;
+     -webkit-box-shadow:0px 1px 1px #950740;
+    -moz-box-shadow:0px 1px 1px #950740;
+    box-shadow:0px 0px 12px 1px white;
+}
+
+.notifications-empty{
+    color: white !important;
+}
+
+.customButton {
+  background-color: #6f2232;
+  color: white;
+  border: 2px solid #950740;
+  border-radius:5px;
+  cursor: pointer;
+  filter: drop-shadow(0 0 2px #c3073f) drop-shadow(0 0 4px #c3073f) ;
+  transition: .5s;
+}
+
+.customButton:hover {
+  color: white;
+  background-color: #c3073f;
+  filter: drop-shadow(0 0 6px #950740);
 }
 
 #close-notifications{
@@ -159,8 +186,14 @@ export default {
     color: rgb(40, 40, 40);
 }
 
-.notifications-list{
+.notification-txt{
     cursor: pointer;
+    text-align: center;
+    margin-bottom: 1em;
+    font-family: roboto;
+    font-size: 18px;
+    color: #c3073f;
+    border-bottom: 1px solid #c3073f;
 }
 
 .notifications-transition-enter-from,
