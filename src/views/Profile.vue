@@ -1,6 +1,9 @@
 <template>
     <div class="profile-main">
     <div class="faceit-info" v-if="this.thisCurrentUser.faceitVerified == true">
+      <div class="user-premium" v-show="thisCurrentUser.vip == true">
+        <font-awesome-icon class="faa-float animated faa-slow" id="crown-icon" icon="crown" />
+      </div>
       <div class="user-card">
     <div class="user-avatar">
       <img class="profile-avatar" :src="thisUserInfo.avatar" />
@@ -274,7 +277,7 @@ export default {
 }
 
 .change-nickname-box{
-  margin-top: 8em;
+  margin-top: 4em;
     margin-right: auto;
     margin-bottom: auto;
     margin-left: auto;
@@ -362,4 +365,11 @@ export default {
   accent-color: #6f2232;
   margin-left: 0.5em;
 }
+
+#crown-icon{
+  width: 6em;
+  height: 6em;
+  color: #FFD700;
+}
+
 </style>

@@ -413,32 +413,6 @@ export default {
     max-width: 25em;
 }
 
-#itemsv2 {
- display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100px;
-      height: 50px;
-      margin-bottom: 8px;
-      margin-left: 9.5em;
-      cursor: pointer;
-      color: #fefefe;
-      background-color: #242424;
-      text-align: center;
-}
-
-#optionsv2 {
-    display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 50px;
-      height: 50px;
-      margin-bottom: 8px;
-      color: #fefefe;
-      background-color: rgb(255, 255, 255);  
-      margin-left: 0.2em;
-      border: none !important;
-}
 
 .form-group{
     color: white;

@@ -2,7 +2,11 @@
     <h2 class="title">Global Ranking</h2>
     <div class="your-stats">
         <h4>Your stats:</h4>
-        <p v-if="thisCurrentUser.faceitVerified == true">Skill level: {{myStats.skill_level}} Elo: {{myStats.faceit_elo}}</p>
+        <p v-if="thisCurrentUser.faceitVerified == true">
+            <img class="ranking-avatar" v-if="thisCurrentUser.faceitAvatar != '' " :src="thisCurrentUser.faceitAvatar" />
+            <img class="ranking-avatar" v-if="thisCurrentUser.faceitAvatar == '' || thisCurrentUser.faceitAvatar == undefinied " :src="require('@/assets/unknown.jpg')" />
+            Skill level: {{myStats.skill_level}} Elo: {{myStats.faceit_elo}}
+        </p>
         <p v-if="thisCurrentUser.faceitVerified == false"> Please bind your account with faceit</p>
     </div>
     <div class="ranking">
@@ -151,6 +155,13 @@ table.table-bordered > thead > tr > th{
 }
 table.table-bordered > tbody > tr > td{
     border:1px solid #6f2232;
+}
+
+.ranking-avatar{
+    max-width: 4em;
+  max-height: 4em;
+  border-radius: 50%;
+  border: 2px solid #950740;
 }
 
 </style>

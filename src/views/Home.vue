@@ -82,6 +82,9 @@
         </div>
 
     </div>
+    <div class="tournament-list-page">
+        Page: {{currentPage + 1}} / {{totalPages}}
+    </div>
 </div>
 </template>
 
@@ -411,6 +414,10 @@ selected-transition-enter-active
  }
 
  .selected-row{
+    float: right;
+ }
+
+ .tournament-list-page{
     float: right;
  }
 

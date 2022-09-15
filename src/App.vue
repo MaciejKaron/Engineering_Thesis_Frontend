@@ -73,5 +73,28 @@ created() {
   height: 100%
 }
 
+/* custom SCROLLBAR */
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #141417;
+  border: 0.01px solid grey;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #950740;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #c3073f;
+}
+
 
 </style>

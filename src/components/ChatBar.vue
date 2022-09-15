@@ -12,23 +12,27 @@
     <div class="chat-container">
         <div class="row h-10">
             <div class="close-chat">
-                <button id="close" @click="$emit('toggleChat'); clearConvFriends()">X</button>
+                <button class="chatBarButton" id="close" @click="$emit('toggleChat'); clearConvFriends()">X</button>
             </div>
         </div>
         <div class="row h-90" id="Chat-window" >
             <div class="col-4" id="conversations-list">
                 <p>Conversations</p>
-                <ul>
-                    <li 
+                <div>
+                    <div 
                     :class="{ active: index == currentIndex, 'noNotification': markerId != friend._id, 'notification': markerId == friend._id }" 
                     v-for="(friend,index) in conversationFriends"
                     :key="index"
                     @click="setActiveConversation(friend, index)">
-            
+                    <div class="users-list">
+                    <img class="chat-avatar" v-if="friend.faceitAvatar != '' " :src="friend.faceitAvatar" />
+                    <img class="chat-avatar" v-if="friend.faceitAvatar == '' || friend.faceitAvatar == undefinied " :src="require('@/assets/unknown.jpg')" />
                     {{friend.username}}
+                    <div class="line-broder"></div>
+                    </div>
 
-                    </li>
-                </ul>
+                </div>
+            </div>
             </div>
             <div class="col-8" id="right-side-chat-window"> 
                 <div class="row h-70" id="messages">
@@ -38,13 +42,13 @@
                 :key="index">
                     <div class="currentTexter" v-show="message.sender === thisCurrentUser._id && currentChat">
                         {{message.text}}
-                        <div class="data">
+                        <div class="date">
                         {{displayDate(message.createdAt)}}
                         </div>
                     </div>
                     <div class="otherTexter" v-show="message.sender !== thisCurrentUser._id && currentChat">
                         {{message.text}}
-                        <div class="data">
+                        <div class="date">
                         {{displayDate(message.createdAt)}}
                         </div>
                     </div>
@@ -55,10 +59,10 @@
                     <div class="col-12">
                         <div class="message-area">
                         <div class="message-a">
-                            <textarea class="form-control" id="text-area" v-model="newMessage" rows="3" placeholder="Your message ..." @click="resetMarker()"></textarea>
+                            <textarea class="form-control textarea" id="text-area" v-model="newMessage" rows="3" placeholder="Your message ..." style="background-color: #141417; color: white;" @click="resetMarker()"></textarea>
                         </div>
                         <div class="button-a">
-                            <button class="send-message" @click="createMessage(); sendMessageSocket()">Send</button>
+                            <button class="send-message chatBarButton" @click="createMessage(); sendMessageSocket()">Send</button>
                         </div>
                         </div>
                     </div>
@@ -340,6 +344,9 @@ export default {
 #chatB {
     width:3em;
     height: 3em;
+    background-color: #1a1a1d;
+    color: white;
+    box-shadow:0px 0px 6px 1px white;
 }
 
 .chatbar{
@@ -350,20 +357,67 @@ export default {
     justify-content: flex-start;
     width: 50em;
     height: 25em;
-    background-color: rgb(184, 65, 186);  
     z-index: 19; 
     transition: all 300ms ease-in-out;
+    background-color: #1a1a1d;
+    color: white; 
+    box-shadow:0px 0px 6px 1px white;
 }
 
 .close-chat{
     width:50em;
     height:2em;
-    background-color: rgb(215, 33, 218);
+    background-color: #141417;
+    color: white;
 }
 
 #close{
      float: right;
+     color: white;
 }
+
+.textarea{
+    background-color: #141417;
+    color: white;
+    border: 1px solid black;
+}
+
+/* ::placeholder{
+    color: white;
+} */
+
+
+.chatBarButton {
+  background-color: #6f2232;
+  color: white;
+  border: 2px solid #950740;
+  border-radius:5px;
+  cursor: pointer;
+  filter: drop-shadow(0 0 2px #c3073f) drop-shadow(0 0 4px #c3073f) ;
+  transition: .5s;
+}
+
+.chatBarButton:hover {
+  color: white;
+  background-color: #c3073f;
+  filter: drop-shadow(0 0 6px #950740);
+}
+
+.chat-avatar{ 
+  max-width: 2em;
+  max-height: 2em;
+  border-radius: 66px;
+  margin-right: 0.5em;
+  cursor: pointer;
+}
+
+
+.line-broder{
+    border-bottom: 1px solid white;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em; 
+}
+
 
 .col-4{
     border-right: 1px solid #000;
@@ -444,9 +498,9 @@ display: inline-block;
   vertical-align: middle;
 }
 
-.data{
+.date{
     font-size: 12px;
-    color: rgb(44, 44, 44);
+    color: rgb(200, 200, 200);
 }
 
 .notification{
@@ -462,6 +516,27 @@ display: inline-block;
 .chat-transition-enter-active
 .chat-transition-leave-active{
     transition: all 0.5s ease-out;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #141417;
+  border: 0.01px solid grey;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #950740;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #c3073f;
 }
 
 </style>

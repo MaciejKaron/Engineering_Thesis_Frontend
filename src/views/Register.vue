@@ -1,31 +1,31 @@
 <template>
-   <div class="col-md-12">
+   <div class="col-md-12 main-register-box">
     <div class="card card-container">
       <Form @submit="handleRegister" :validation-schema="schema">
         <div v-if="!successful">
           <div class="form-group">
             <label for="username">Username</label>
-            <Field name="username" type="text" class="form-control" />
+            <Field name="username" type="text" class="form-control field-input" />
             <ErrorMessage name="username" class="error-feedback" />
           </div>
           <div class="form-group">
             <label for="email">Email</label>
-            <Field name="email" type="email" class="form-control" />
+            <Field name="email" type="email" class="form-control field-input" />
             <ErrorMessage name="email" class="error-feedback" />
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <Field name="password" type="password" class="form-control" />
+            <Field name="password" type="password" class="form-control field-input" />
             <ErrorMessage name="password" class="error-feedback" />
           </div>
           <div class="form-group">
             <label for="repeatPassword">Repeat password</label>
-            <Field name="repeatPassword" type="password" class="form-control" />
+            <Field name="repeatPassword" type="password" class="form-control field-input" />
             <ErrorMessage name="repeatPassword" class="error-feedback" />
           </div>
 
           <div class="form-group">
-            <button class="btn btn-primary btn-block" :disabled="loading">
+            <button class="btn btn-primary btn-block register-button" :disabled="loading">
               <span
                 v-show="loading"
                 class="spinner-border spinner-border-sm"
@@ -36,12 +36,11 @@
         </div>
       </Form>
 
-      <div
-        v-if="message"
-        class="alert"
-        :class="successful ? 'alert-success' : 'alert-danger'"
-      >
+      <div class="succes-register" v-if="message">
+        <font-awesome-icon class="faa-wrench animated faa-slow" id="thumb-icon" icon="thumbs-up" />
+        <div class="success-txt">
         {{ message }}
+        </div>
       </div>
     </div>
   </div>
@@ -123,27 +122,73 @@ export default {
 }
 </script>
 <style scoped>
+
+.main-register-box{
+  height: 42em;
+display: flex;
+align-items: center;
+justify-content: center;
+  color: white;
+  font-family: roboto;
+  text-align: center;
+}
+
+.card-container.card {
+  width: 24em;
+  height: 34em;
+  padding: 40px 40px;
+  background-color: #1a1a1d;
+  color: white;
+  box-shadow:0px 0px 12px 1px #c3073f;
+}
+
 label {
   display: block;
   margin-top: 10px;
 }
-.card-container.card {
-  max-width: 350px !important;
-  padding: 40px 40px;
+
+.field-input {
+  background-color: #141417;
+  color: white;
 }
-.card {
-  background-color: #f7f7f7;
-  padding: 20px 25px 30px;
-  margin: 0 auto 25px;
-  margin-top: 50px;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-  border-radius: 2px;
-  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-}
+
 .error-feedback {
   color: red;
+}
+
+.register-button {
+  background-color: #6f2232;
+  color: white;
+  border: 2px solid #950740;
+  border-radius:5px;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px #c3073f) drop-shadow(0 0 8px #c3073f) ;
+  transition: .5s;
+}
+
+.register-button:hover {
+  color: white;
+  background-color: #c3073f;
+  filter: drop-shadow(0 0 6px #950740);
+}
+
+.succes-register{
+  color: green;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: block;
+}
+
+.success-txt{
+  text-align: center;
+  font-size: 28px;
+  display: block;
+}
+
+#thumb-icon{
+  width: 8em;
+  height: 8em;
+  margin-bottom: 4em;
 }
 </style>

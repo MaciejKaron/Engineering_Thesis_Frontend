@@ -1,15 +1,48 @@
 <template>
-<div class="team-name">{{currentTeam.name}}</div>
-<div class="team-tag">{{currentTeam.tag}}</div>
-<div class="team-owner">Owner: {{teamOwner.username}}</div>
-<div class="team-players">Players:
-    <ul>
-        <li class="players-list"
-             v-for="player in teamPlayers" :key="player._id">
-                {{player.username}}
-        </li>
-    </ul>
-</div>
+<div class="wrapper">
+            <div class="your-team">
+                <div class="after_txt">
+                <h2>{{currentTeam.name}} / {{currentTeam.tag}}</h2>
+                <p><strong>OWNER:</strong></p>
+                <div class="member-box">
+                        <div class="member-avatar">
+                            <img class="avatar" v-if="teamOwner.faceitAvatar != '' " :src="teamOwner.faceitAvatar" />
+                            <img class="avatar" v-if="teamOwner.faceitAvatar == '' " :src="require('@/assets/unknown.jpg')" />
+                        </div>
+                        <div class="member-username"> 
+                            {{teamOwner.username}}
+                        </div>
+                        <div class="member-verified">
+                            {{teamOwner.faceitVerified ? "Verified" : "Not verified"}}
+                        </div>
+                        </div>
+                <p><strong>MEMBERS:</strong></p>
+                <div class="members-list">
+                <div class="row">
+                    <!-- LIST OF TEAM MEMBERS -->
+                    <div class="col-sm"
+                    v-for="(friend,index) in teamPlayers"
+                    :key="index">
+                        <div class="member-box">
+                        <div class="member-avatar">
+                            <img class="avatar" v-if="friend.faceitAvatar != '' " :src="friend.faceitAvatar" />
+                            <img class="avatar" v-if="friend.faceitAvatar == '' " :src="require('@/assets/unknown.jpg')" />
+                        </div>
+                        <div class="member-username"> 
+                            {{friend.username}}
+                        </div>
+                        <div class="member-verified">
+                            {{friend.faceitVerified ? "Verified" : "Not verified"}}
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            
+                </div>
+                
+                </div>
+            </div>
+    </div>
 </template>
 
 <script>
@@ -61,26 +94,57 @@ export default {
 </script>
 
 <style scoped>
-.team-name{
-    font-size: 32px;
-    text-align: center;
+.wrapper{
+    margin-top: 6em;
 }
 
-.team-tag{
-    margin-top: 1em;
-    font-size: 28px;
-    text-align: center;
+.your-team{
+    max-width: 60em;
+    margin-top: auto;
+    margin-right: auto;
+    margin-bottom: 0;
+    margin-left: auto;
+     text-align: center;
+     font-family: roboto;
+     color: white;
 }
 
-.team-owner{
-    margin-top: 1em;
-    font-size: 24px;
-    text-align: center;
+.add_txt{
+  text-align: center;
+  margin-bottom: 3em;
+  color: white;
 }
 
-.team-players{
+.member-box{
+    background-color: #1a1a1d;
+    width: 10em;
+    height: 10em;
     margin-top: 1em;
-    font-size: 24px;
-    text-align: center;
+    margin-right: auto;
+    margin-bottom: 0.5em;
+    margin-left: auto;
+     text-align: center;
+     font-family: roboto;
+     border-radius: 5%;
+     border: 1px solid #6f2232;
+}
+
+.avatar{ 
+    margin-top: 1em;
+  max-width: 4em;
+  max-height: 4em;
+  border-radius: 66px;
+}
+
+.member-username{
+    margin-top: 0.5em;
+}
+
+.memeber-verified{
+    margin-top: 1em;
+}
+
+.leave-box{
+    margin-top: 2em;
 }
 </style>
