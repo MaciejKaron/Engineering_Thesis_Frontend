@@ -106,7 +106,24 @@
     <div class="tournament-list-page">
         Page: {{currentPage + 1}} / {{totalPages}}
     </div>
-    <button class="delete-all-button add-buttons" @click="alert()">Delete all</button>
+    <button class="delete-all-button add-buttons" @click="showPopup()">Delete all</button>
+    <Popup
+      v-show="isPopupVisible"
+      @close="closePopup()"
+      >
+      <template v-slot:header>
+      <!-- This is a new modal header. -->
+      </template>
+
+      <template v-slot:body>
+      <div class="popup-txt">Do you really want to delete all tournaments?</div>
+      <button class="add-buttons edit-delete-v2" @click="removeAllTournaments()">DELETE!</button>
+      </template>
+
+      <template v-slot:footer>
+      <!-- This is a new modal footer. -->
+      </template>
+    </Popup>
         </div>
     </div>
 </div>
@@ -116,8 +133,12 @@
 import tournamentService from "@/services/tournament.service";
 import userService from "@/services/user.service";
 import moment from "moment"
+import Popup from "@/components/Popup.vue";
 export default {
     name: "BoardAdmin-comp",
+    components: {
+    Popup,
+},
     data() {
         return {
             tournament: {
@@ -144,6 +165,7 @@ export default {
             totalItems: null,
             thisUser: null, 
             isActive: false,
+            isPopupVisible: false,
         }
     },
     methods: {
@@ -225,7 +247,8 @@ export default {
             tournamentService.deleteAllTournaments()
                 .then((response) => {
                     console.log(response.data)
-                this.refreshList()
+                    this.refreshList()
+                    this.closePopup()
                 })
                 .catch(e => {
                 console.log(e)
@@ -289,12 +312,12 @@ export default {
         goToEdit() {
           this.$router.push({name:'tournamentEdit', params: {id: this.currentTournament._id}});
         },
-        alert() {
-            if (confirm('Are you sure you want to delete all tournaments?')) {
-                this.removeAllTournaments()
-                console.log('Successfully deleted all tournaments');
-            }   
-        },
+        showPopup() {
+          this.isPopupVisible = true
+      },
+        closePopup() {
+          this.isPopupVisible = false
+        }
      
     },
     mounted() {
@@ -478,6 +501,17 @@ selected-transition-enter-active
 
 .tournament-extend{
     width: 90%;
+}
+
+.popup-txt{
+  color: white;
+  font-family: roboto;
+  font-size: 24px;
+}
+
+
+.edit-delete-v2{
+    margin-top: 2em;
 }
 
 

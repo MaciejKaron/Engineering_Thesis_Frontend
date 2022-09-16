@@ -96,5 +96,22 @@ created() {
   background: #c3073f;
 }
 
+/* //notification toasts */
+.v-toast__item--success {
+    background-color: #141417 !important;
+    box-shadow: 0px 0px 12px 1px #c3073f !important;
+    color: white !important;
+    margin-top: 4em !important;
+    max-width: 14em !important;
+}
+
+.v-toast__item--error {
+    background-color: #6f2232 !important;
+    box-shadow: 0px 0px 24px 2px #141417 !important;
+    color: white !important;
+    margin-top: 4em !important;
+    max-width: 14em !important;
+}
+
 
 </style>

@@ -75,7 +75,24 @@
                 <div class="team-settings" v-if="thisCurrentUser.isInTeam == true && thisCurrentUser._id == currentTeam.owner">
                 <h4>Team Settings</h4>
                 <!-- <button class="btn btn-success" @click="goToYourTeam()">Team settings</button> -->
-                <button class="team-delete-button customButton" @click="deleteTeam(); sendInfoSocketDelete()">Delete your team</button>
+                <button class="team-delete-button customButton" @click="showPopup()">Delete your team</button>
+                <Popup
+                    v-show="isPopupVisible"
+                    @close="closePopup()"
+                    >
+                    <template v-slot:header>
+                    <!-- This is a new modal header. -->
+                    </template>
+
+                    <template v-slot:body>
+                    <div class="popup-txt">Do you really want to delete your team?</div>
+                    <button class="customButton edit-delete-v2" @click="deleteTeam(); sendInfoSocketDelete()">DELETE!</button>
+                    </template>
+
+                    <template v-slot:footer>
+                    <!-- This is a new modal footer. -->
+                    </template>
+                </Popup>
             </div>
 
     </div>
@@ -85,8 +102,12 @@
 import teamService from "@/services/team.service"
 import userService from "@/services/user.service"
 import socketioService from '@/services/socketio.service'
+import Popup from "@/components/Popup.vue"
 export default {
     name: "Team-comp",
+    components: {
+    Popup,
+},
     data() {
         return {
             team: {
@@ -106,6 +127,7 @@ export default {
             thisUser: null,
             currentIndex: -1,
             thisPlayer: null,
+            isPopupVisible: false,
         }
     },
     methods: {
@@ -347,6 +369,12 @@ export default {
     log(message) {
             console.log(message);
         },
+        showPopup() {
+          this.isPopupVisible = true
+      },
+      closePopup() {
+          this.isPopupVisible = false
+        }
     },
     mounted() {
         this.getOneUser(this.currentUser._id) 
@@ -481,6 +509,16 @@ export default {
     -webkit-box-shadow:0px 1px 1px #950740;
     -moz-box-shadow:0px 1px 1px #950740;
     box-shadow:0px 0px 36px 2px #c3073f;
+}
+
+.popup-txt{
+  color: white;
+  font-family: roboto;
+  font-size: 24px;
+}
+
+.edit-delete-v2{
+  margin-top: 2em;
 }
 
 </style>

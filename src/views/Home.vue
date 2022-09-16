@@ -92,6 +92,8 @@
 import tournamentService from "@/services/tournament.service";
 import userService from "@/services/user.service";
 import moment from "moment"
+import {useToast} from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
 // import image from "../assets/background.jpg"
 
 export default {
@@ -109,7 +111,8 @@ export default {
             totalPages: null,
             totalItems: null,
             thisCurrentUser: null,  
-            isActive: false,   
+            isActive: false,
+            toast: useToast()
         }
     },
     methods: {
@@ -172,10 +175,22 @@ export default {
             tournamentService.addUserToTournament(this.currentTournament._id, this.currentUser)
                 .then(response => {
                     console.log(response.data)
-                this.refreshList()
+                    this.refreshList()
+                    this.toast.open({
+                        message: response.data.msg,
+                        type: 'success',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
                 })
                 .catch(e => {
-                console.log(e)
+                    console.log(e)
+                    this.toast.open({
+                        message: e.response.data.msg,
+                        type: 'error',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
             })
         },
 
@@ -183,10 +198,22 @@ export default {
             tournamentService.leaveUserFromTournament(this.currentTournament._id, this.currentUser)
                 .then(response => {
                     console.log(response.data)
-            this.refreshList()
+                    this.refreshList()
+                    this.toast.open({
+                        message: response.data.msg,
+                        type: 'success',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
                 })  
                 .catch(e => {
-            console.log(e)
+                    console.log(e)
+                    this.toast.open({
+                        message: e.response.data.msg,
+                        type: 'error',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
           })
         },
 
@@ -197,10 +224,22 @@ export default {
             tournamentService.addTeamToTournament(this.currentTournament._id, data)
                 .then(response => {
                     console.log(response.data);
-            this.refreshList()
+                    this.refreshList()
+                    this.toast.open({
+                        message: response.data.msg,
+                        type: 'success',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
                 })  
           .catch(e => {
-            console.log(e)
+              console.log(e)
+              this.toast.open({
+                        message: e.response.data.msg,
+                        type: 'error',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
           })
         },
 
@@ -211,10 +250,22 @@ export default {
             tournamentService.leaveTeamFromTournament(this.currentTournament._id, data)
                 .then(response => {
                     console.log(response.data);
-            this.refreshList()
+                    this.refreshList()
+                    this.toast.open({
+                        message: response.data.msg,
+                        type: 'success',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
                 })  
           .catch(e => {
-            console.log(e)
+              console.log(e)
+              this.toast.open({
+                        message: e.response.data.msg,
+                        type: 'error',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
           })
         },
 
@@ -420,5 +471,6 @@ selected-transition-enter-active
  .tournament-list-page{
     float: right;
  }
+
 
 </style>

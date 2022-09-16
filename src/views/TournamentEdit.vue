@@ -46,10 +46,29 @@
     </button> -->
     <div class="tournament-edit-options">
     <button class="tournament-edit-delete"
-      @click="deleteThisTournament"
+      @click="showPopup()"
     >
       Delete
     </button>
+
+    <Popup
+      v-show="isPopupVisible"
+      @close="closePopup()"
+      >
+      <template v-slot:header>
+      <!-- This is a new modal header. -->
+      </template>
+
+      <template v-slot:body>
+      <div class="popup-txt">Do you really want to delete this tournament?</div>
+      <button class="tournament-edit-delete edit-delete-v2" @click="deleteThisTournament()">DELETE!</button>
+      </template>
+
+      <template v-slot:footer>
+      <!-- This is a new modal footer. -->
+      </template>
+    </Popup>
+
     <button type="submit" class="tournament-edit-update"
       @click="updateThisTournament"
     >
@@ -68,13 +87,18 @@
 
 <script>
 import tournamentService from "@/services/tournament.service";
+import Popup from "@/components/Popup.vue";
 export default {
-    name: "TournamentEdit-comp",
+  name: "TournamentEdit-comp",
+  components: {
+    Popup,
+},
     data() {
         return {
           currentTournament: null,
           message: "",
-          modes: ["1v1","5v5"],
+          modes: ["1v1", "5v5"],
+          isPopupVisible: false,
         }
     },
     methods: {
@@ -148,7 +172,13 @@ export default {
       },
       goReturn() {
           this.$router.push({name:'admin'});
-        },
+      },
+      showPopup() {
+          this.isPopupVisible = true
+      },
+      closePopup() {
+          this.isPopupVisible = false
+        }
     },
     mounted() {
         this.message = ""
@@ -266,6 +296,16 @@ export default {
   -webkit-box-shadow:0px 1px 1px #950740;
   -moz-box-shadow:0px 0px 1px #950740;
    box-shadow: 2px 2px 4px #c3073f;
+}
+
+.popup-txt{
+  color: white;
+  font-family: roboto;
+  font-size: 24px;
+}
+
+.edit-delete-v2{
+  margin-top: 2em;
 }
 
 </style>
