@@ -101,6 +101,8 @@
       border-bottom: 1px solid #eeeeee;
       color: #4AAE9B;
       justify-content: space-between;
+      color: white;
+      font-family: roboto;
     }
   
     .modal-footer {
@@ -116,6 +118,8 @@
       margin-bottom: 0;
       margin-left: auto;
       text-align: center; 
+      overflow-x: hidden;
+      overflow-y:auto;
     }
   
     .btn-close {

@@ -3,9 +3,9 @@
     <div class="get-premium">
         <div class="premium">
             <div class="premium-icons" v-if="thisUser.vip == true">
-            <font-awesome-icon id="icon-dolar" icon="dollar-sign" />
-            <font-awesome-icon id="icon-happy" icon="face-laugh-beam" />
-            <font-awesome-icon id="icon-dolar" icon="dollar-sign" />
+            <font-awesome-icon class="faa-pulse animated faa-slow" id="icon-dolar" icon="dollar-sign" />
+            <font-awesome-icon class="faa-float animated faa-slow" id="icon-happy" icon="face-laugh-beam" />
+            <font-awesome-icon class="faa-pulse animated faa-slow" id="icon-dolar" icon="dollar-sign" />
             </div>
             <h2 class="premium-title">Premium Account</h2>
             <h3 class="premium-price">Only 5$</h3>
@@ -168,10 +168,12 @@ export default {
 
 #icon-happy{
     height: 4em;
+    color: yellow;
 }
 
 #icon-dolar{
     height: 3em;
+    color: #FFD700;
 }
 
 </style>

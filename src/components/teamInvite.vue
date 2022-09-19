@@ -6,8 +6,8 @@
     {{senderUsername.username}} send you a party invite to {{teamName.name}}
     </div>
     <div class="invite-buttons">
-        <button id="invite-accept" @click="confirmTeamInvitation(); closeInviteWindow(); sendInfoSocketConfirm()">Accept</button>
-        <button id="invite-refuse" @click="declineTeamInvitation(); closeInviteWindow(); sendInfoSocketDecline()">Refuse</button>
+        <button class="inviteButton" id="invite-accept" @click="confirmTeamInvitation(); closeInviteWindow(); sendInfoSocketConfirm()">Accept</button>
+        <button class="inviteButton" id="invite-refuse" @click="declineTeamInvitation(); closeInviteWindow(); sendInfoSocketDecline()">Refuse</button>
     </div>
   </div>
 </div>
@@ -164,21 +164,29 @@ export default {
 <style scoped>
 
 .containerv3 {
-    background: rgba(255,255,255,0.5);
-backdrop-filter: blur(5px);
-width: 100%;
-height: 100%;
-position: absolute;
-z-index: 30;
+    position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 30;
 }
 
 .childv3 {
   width: 40em;
   height: 10em;
-  background-color: rgb(224, 62, 62);
+  background-color: #1a1a1d;
+  color: white;
+  box-shadow: 0px 0px 12px 1px white;
+  font-family: roboto;
+  font-size: 18px;
   /* Center vertically and horizontally */
   position: absolute;
-  top: 40%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 30;
@@ -198,4 +206,21 @@ z-index: 30;
 #invite-refuse{
     margin-left: 1em;
 }
+
+.inviteButton {
+        cursor: pointer;
+        background-color: #6f2232;
+        color: white;
+        border: 2px solid #950740;
+        border-radius:5px;
+        cursor: pointer;
+        filter: drop-shadow(0 0 4px #c3073f) drop-shadow(0 0 8px #c3073f) ;
+        transition: .5s;
+    }
+
+    .inviteButton:hover {
+        color: white;
+        background-color: #c3073f;
+        filter: drop-shadow(0 0 6px #950740);
+    }
 </style>

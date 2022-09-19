@@ -63,6 +63,7 @@
                 </div>
                 <div class="tournament-players" v-if="currentTournament.mode == '1v1'">
                     <font-awesome-icon icon="people-group" />   Players: {{tournament.players.length}} / 32
+                    <button @click="showPopup()">Check</button>
                 </div>
                 <div class="tournament-teams" v-if="currentTournament.mode == '5v5'">
                     <font-awesome-icon icon="people-group" />   Teams: {{tournament.teams.length}} / 8
@@ -80,12 +81,61 @@
             </div>
             </transition>
         </div>
-
     </div>
     <div class="tournament-list-page">
         Page: {{currentPage + 1}} / {{totalPages}}
     </div>
-</div>
+</div> 
+<Popup
+            v-show="isPopupVisible"
+            @close="closePopup()"
+            >
+            <template v-slot:header>
+                {{tournamentTitle}}
+            </template>
+
+            <template v-slot:body>
+                <ul>
+                <li class="tournament-players-list" 
+                v-for="(player,index) in tournamentPlayers" :key="index"
+                @click="setActiveUser(player,index)">
+                <div class="row">
+                    <div class="col-sm-3">
+                        Avatar
+                    </div>
+                    <div class="col-sm-3">
+                        Name
+                    </div>
+                    <div class="col-sm-3">
+                        Lvl
+                    </div>
+                    <div class="col-sm-3">
+                        Elo
+                    </div>
+                </div>
+                <div class="row second-row">
+                    <div class="col-sm-3">
+                        <img class="tournament-player-avatar" v-if="player.faceitAvatar != '' " :src="player.faceitAvatar" />
+                    </div>
+                    <div class="col-sm-3">
+                        {{player.username}}
+                    </div>
+                    <div class="col-sm-3">
+                        {{player.skill_level}}
+                    </div>
+                    <div class="col-sm-3">
+                        {{player.faceit_elo}}
+                    </div>
+                </div>
+                        <div class="players-line-broder"></div>
+                </li>
+            </ul>
+            </template>
+
+            <template v-slot:footer>
+            <!-- This is a new modal footer. -->
+            </template>
+        </Popup>
 </template>
 
 <script>
@@ -94,10 +144,15 @@ import userService from "@/services/user.service";
 import moment from "moment"
 import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+import Popup from "@/components/Popup.vue";
+import faceitService from "@/services/faceit.service";
 // import image from "../assets/background.jpg"
 
 export default {
     name: "Home-comp",
+    components: {
+    Popup,
+},
     data() {
         return {
             tournaments: [],
@@ -112,7 +167,13 @@ export default {
             totalItems: null,
             thisCurrentUser: null,  
             isActive: false,
-            toast: useToast()
+            toast: useToast(),
+            isPopupVisible: false,
+            tournamentTitle: "",
+            tournamentPlayers: [],
+            thisUser: null,
+            currentUserIndex: -1,
+            thisStats: [],
         }
     },
     methods: {
@@ -134,12 +195,14 @@ export default {
                 this.currentPage++
                 this.getAllPublishedTournaments()
             }
+            this.currentIndex = -1
         },
          previousPage() {
             if (!(this.currentPage === 0)) {
                 this.currentPage--
                 this.getAllPublishedTournaments()
-            }
+             }
+             this.currentIndex = -1
         },
         filteredTitle() {
             this.currentPage = 0
@@ -159,7 +222,22 @@ export default {
         setActiveTournament(tournament, index) {
             this.currentTournament = tournament
             this.currentIndex = index
-            this.isActive = !this.isActive
+            this.isActive = true
+            this.tournamentPlayers = []
+            this.tournamentTitle = this.currentTournament.title
+
+            for (let i = 0; i < tournament.players.length; i++){
+                userService.findOneUser(tournament.players[i])
+                    .then(response => {
+                        faceitService.getMyFaceitStats(tournament.players[i])
+                            .then(responsev2 => {
+                                const { skill_level, faceit_elo } = responsev2.data.games.csgo
+                                const { _id, username, faceitAvatar} = response.data
+                                this.tournamentPlayers.push({_id, username, faceitAvatar, skill_level, faceit_elo})
+                                console.log(this.tournamentPlayers);      
+                        })
+                })
+            }
         },
         removeAllTournaments() {
             tournamentService.deleteAllTournaments()
@@ -290,6 +368,21 @@ export default {
         reloadPage() {
       window.location.reload();
         },
+        showPopup() {
+          this.isPopupVisible = true
+      },
+      closePopup() {
+          this.isPopupVisible = false
+        },
+        setActiveUser(player, index) {
+            this.thisUser = player
+            this.currentUserIndex = index
+            // console.log(this.thisUser);
+            this.goToProfile()
+        },
+        goToProfile() {
+          this.$router.push({name:'UserProfile', params: {id: this.thisUser._id}});
+    },
     },
     mounted() {
         this.getAllPublishedTournaments()
@@ -472,5 +565,30 @@ selected-transition-enter-active
     float: right;
  }
 
+ .tournament-player-avatar{
+    max-width: 2em;
+  max-height: 2em;
+  border-radius: 50%;
+  margin-right: 0.5em;
+ }
+
+ .tournament-players-list{
+    cursor: pointer;
+    text-align: left;
+    color: white;
+    list-style-type: none;  
+    font-family: roboto;
+ }
+
+ .players-line-broder{
+    border-bottom: 1px solid white;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em; 
+    max-width: 100%;
+ }
+
+ .second-row{
+    margin-top: 0.5em;
+ }
 
 </style>

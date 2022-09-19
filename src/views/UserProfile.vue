@@ -1,5 +1,14 @@
 <template>
 <div v-if="thisUser" class="userProfile-main">
+<div class="user-is-not-verified" v-if="thisUser.faceitVerified == false || thisUser.faceitVerified == undefinied">
+    <div class="user-card">
+        <img class="userProfile-avatar" v-if="thisUser.faceitAvatar == '' || thisUser.faceitAvatar == undefinied " :src="require('@/assets/unknown.jpg')" />
+        <div class="user-nickname">
+        <h2>{{thisUser.username}}</h2>
+        </div>
+    </div>
+    <h2 class="welcome-no-verified">This user has not binded their account with faceit</h2>
+</div>
 <div class="faceit-info" v-if="this.thisUser.faceitVerified == true">
       <div class="user-premium" v-show="thisUser.vip == true">
         <font-awesome-icon class="faa-float animated faa-slow" id="crown-icon" icon="crown" />
@@ -90,8 +99,10 @@ export default {
                 .then(response => {
                     this.thisUser = response.data
                     // console.log(response.data)
-                    this.getMyFaceitStats(this.thisUser._id)
-                    this.getGameStats(this.thisUser._id)
+                    if (this.thisUser.faceitVerified == true) {
+                        this.getMyFaceitStats(this.thisUser._id)
+                        this.getGameStats(this.thisUser._id)
+                    }
                 })
                 .catch(e => {
                 console.log(e)
@@ -384,5 +395,21 @@ export default {
 .addFriend-buttons{
     margin-top: 3em;
     text-align: center;
+}
+
+.user-is-not-verified{
+    max-width: 60em;
+    margin-top: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    text-align: center;
+    font-family: roboto;
+    color: white;
+    font-family: roboto;
+}
+
+.welcome-no-verified{
+    margin-top: 1em;
 }
 </style>

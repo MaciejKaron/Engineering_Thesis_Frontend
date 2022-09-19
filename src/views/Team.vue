@@ -46,7 +46,7 @@
                         <div class="member-box">
                         <div class="member-avatar">
                             <img class="avatar" v-if="friend.faceitAvatar != '' " :src="friend.faceitAvatar" />
-                            <img class="avatar" v-if="friend.faceitAvatar == '' " :src="require('@/assets/unknown.jpg')" />
+                            <img class="avatar" v-if="friend.faceitAvatar == '' || friend.faceitAvatar == undefined " :src="require('@/assets/unknown.jpg')" />
                         </div>
                         <div class="member-username"> 
                             {{friend.username}}
