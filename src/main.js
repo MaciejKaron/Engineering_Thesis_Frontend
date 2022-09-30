@@ -9,6 +9,7 @@ import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import ToastPlugin from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+import CountryFlag from 'vue-country-flag-next'
 
 
 createApp(App)
@@ -16,6 +17,7 @@ createApp(App)
     .use(store)
     .use(BootstrapVue3)
     .use(ToastPlugin)
+    .use(CountryFlag)
     .component("font-awesome-icon", FontAwesomeIcon)
     .component('Datepicker', Datepicker)
     .mount('#app')

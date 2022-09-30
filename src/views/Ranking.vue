@@ -56,7 +56,6 @@ export default {
     name: "Ranking-comp",
     data() {
         return {
-            verifiedUsers: [],
             rankingStats: [],
             loaded: false,
             sortedByAscii: true,
@@ -66,14 +65,7 @@ export default {
         }
     },
     methods: {
-        getVerifiedUsers(){
-            faceitService.getVerifiedUsers()
-                .then(response => {
-                    this.verifiedUsers = response.data
-                    
-                // console.log(this.verifiedUsers);
-            })
-        },
+        
         getRankingStats() {
             faceitService.getRankingStats()
                 .then(response => {
@@ -114,7 +106,6 @@ export default {
       },
     },
     mounted() {
-        this.getVerifiedUsers()
         this.getRankingStats()
         this.getCurrentUser(this.currentUser._id)
     },

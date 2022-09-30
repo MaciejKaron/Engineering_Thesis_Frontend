@@ -21,6 +21,12 @@
             <div class="your-team">
                 <div class="after_txt" v-if="thisCurrentUser.isInTeam == true">
                 <h2>{{currentTeam.name}} / {{currentTeam.tag}}</h2>
+                <h3 v-if="currentTeam.level != 0">
+                    <font-awesome-icon class="faa-pulse animated faa-slow" id="icon-star" icon="star" />
+                    Team Ratio: {{currentTeam.level}}
+                    <font-awesome-icon class="faa-pulse animated faa-slow" id="icon-star" icon="star" />
+                </h3>
+                    
                 <p><strong>OWNER:</strong></p>
                 <div class="member-box">
                         <div class="member-avatar">
@@ -75,6 +81,9 @@
                 <div class="team-settings" v-if="thisCurrentUser.isInTeam == true && thisCurrentUser._id == currentTeam.owner">
                 <h4>Team Settings</h4>
                 <!-- <button class="btn btn-success" @click="goToYourTeam()">Team settings</button> -->
+                <div>
+                    <button class="customButton" @click="teamReady()">Team ready!</button>
+                </div>
                 <button class="team-delete-button customButton" @click="showPopup()">Delete your team</button>
                 <Popup
                     v-show="isPopupVisible"
@@ -103,6 +112,8 @@ import teamService from "@/services/team.service"
 import userService from "@/services/user.service"
 import socketioService from '@/services/socketio.service'
 import Popup from "@/components/Popup.vue"
+import {useToast} from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
 export default {
     name: "Team-comp",
     components: {
@@ -128,6 +139,8 @@ export default {
             currentIndex: -1,
             thisPlayer: null,
             isPopupVisible: false,
+            teamLevel: 0,
+            toast: useToast(),
         }
     },
     methods: {
@@ -196,7 +209,17 @@ export default {
                     .then(response => {
                         this.players.push(response.data)
                 })
-            }  
+            }
+
+            //FIND TEAM LEVEL
+            if (this.currentTeam.players.length == 5) {
+                for (let i = 0; i < this.currentTeam.players.length; i++) {
+                    userService.findOneUser(this.currentTeam.players[i])
+                        .then(response => {
+                            this.teamLevel += parseInt(response.data.faceitLevel)
+                        })
+                }
+            }
         },
 
         clearPlayersLoop() {
@@ -218,6 +241,7 @@ export default {
                     this.clearPlayersLoop()
                     this.findPlayersLoop()
                 }
+                this.teamLevel = 0
             })
             //IF PLAYER LEAVE
             this.$watch("leaver", () => {
@@ -231,6 +255,14 @@ export default {
                         this.findPlayersLoop()
                     })
                 }
+                this.teamLevel = 0
+                var data = {
+                    level: 0
+                }
+                teamService.updateTeam(this.currentTeam._id, data)
+                    .then(response => {
+                        console.log(response.data.message);
+                    })
             })
             //STANDARD EXECUTE
             this.findPlayersLoop()
@@ -359,6 +391,33 @@ export default {
                 console.log(e);
             })
         }, 
+
+        teamReady() {
+            if (this.currentTeam.players.length == 5) {
+
+                var data = {
+                    level: this.teamLevel/this.currentTeam.players.length
+                }
+                teamService.updateTeam(this.currentTeam._id, data)
+                    .then(response => {
+                        console.log(response.data.message);
+                    })
+                    this.toast.open({
+                        message: 'Team is ready!',
+                        type: 'success',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
+                    this.reloadPage()
+            } else {
+                this.toast.open({
+                        message: 'You must have a full team',
+                        type: 'error',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
+            }
+        },
 
         goToYourTeam() {
             this.$router.push({name:'myTeam', params: {id: this.thisCurrentUser.team[0]}});
@@ -501,15 +560,15 @@ export default {
 }
 
 .leave-box{
-    margin-top: 2em;
+    margin-top: 1em;
 }
 
-.active{
+/* .active{
     border: 1px solid #6f2232;
     -webkit-box-shadow:0px 1px 1px #950740;
     -moz-box-shadow:0px 1px 1px #950740;
     box-shadow:0px 0px 36px 2px #c3073f;
-}
+} */
 
 .popup-txt{
   color: white;
@@ -519,6 +578,15 @@ export default {
 
 .edit-delete-v2{
   margin-top: 2em;
+}
+
+.team-delete-button{
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+#icon-star{
+    color: #FFD700;
 }
 
 </style>

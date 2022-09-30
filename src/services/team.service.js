@@ -22,6 +22,10 @@ class TeamService {
         return axios.delete(API_URL + `team/${id}`)
     }
 
+    updateTeam(id, data) {
+        return axios.put(API_URL + `team/update/${id}`, data)
+    }
+
     deleteAllTeams() {
         return axios.delete(API_URL + 'team/delete/all')
     }

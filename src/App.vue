@@ -56,7 +56,9 @@ export default {
 created() {
   socketioService.setupSocketConnection()
   
-  document.body.style.backgroundColor = "#303033"
+  // document.body.style.backgroundColor = "#303033"
+  var test = document.body;
+        test.style.backgroundImage = `url(${require('@/assets/background6.png')})`
   },
     computed: {
         loggedIn() {

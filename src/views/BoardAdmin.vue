@@ -27,6 +27,12 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label for="mode">Level:</label>
+                    <select id="tournament-level" v-model="tournament.level" @change="handleLevel($event)">
+                    <option v-for="l in levels" :key="l" :value="l">{{l}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="published">Publish:</label>
                     <input id="tournament-checkbox" type="checkbox" v-model="tournament.published" @change="handlePublished($event)"/>
                 </div>
@@ -37,6 +43,28 @@
                 <div class="form-group">
                     <label for="startTime">Start time</label>
                 <Datepicker id="tournament-date" v-model="tournament.startTime" dark @change="handleDate($event)" />
+                </div>
+               
+                <div class="form-group">
+                    <input type="file" accept="image/*" ref="file" @change="selectImage" />
+                    <button :disabled="!currentImage" @click="upload">Upload</button>
+                    <div v-if="currentImage" class="progress">
+                        <div
+                            class="progress-bar progress-bar-info"
+                            role="progressbar"
+                            :aria-valuenow="progress"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            :style="{ width: progress + '%' }"
+                        >
+                            {{ progress }}%
+                        </div>
+                    </div>
+                    <div v-if="previewImage">
+                        <div>
+                            <img class="preview-image" :src="previewImage" alt="" />
+                        </div>
+                    </div>
                 </div>
                 <button @click="saveTournament" class="btn btn-success add-buttons">Submit</button>
                 </div>
@@ -134,6 +162,7 @@ import tournamentService from "@/services/tournament.service";
 import userService from "@/services/user.service";
 import moment from "moment"
 import Popup from "@/components/Popup.vue";
+import uploadFileService from "@/services/uploadFile.service";
 export default {
     name: "BoardAdmin-comp",
     components: {
@@ -149,10 +178,13 @@ export default {
                 premium: false,
                 startTime: "",
                 mode: "",
+                level: "",
+                image: "",
             players: [],    
             },
           submitted: false,
-          modes: ["1v1","5v5"],
+            modes: ["1v1", "5v5"],
+            levels: ["1-3", "4-7", "8-10"],
             tournaments: [],
             currentTournament: null,
             currentIndex: -1,
@@ -166,17 +198,33 @@ export default {
             thisUser: null, 
             isActive: false,
             isPopupVisible: false,
+            selectedFile: null,
+
+            currentImage: undefined,
+            previewImage: undefined,
+            progress: 0,
+            message: "",
+            imageInfos: [],
+
         }
     },
     methods: {
         saveTournament() {
+            for (let i = 0; i < this.imageInfos.length; i++){
+                if (this.currentImage.name == this.imageInfos[i].name) {
+                    this.selectedFile = this.imageInfos[i].url
+                    this.tournament.image = this.selectedFile
+                }
+            }
             var data = {
                 title: this.tournament.title,
                 description: this.tournament.description,
               published: this.tournament.published,
                 mode: this.tournament.mode,
+                level: this.tournament.level,
                 premium: this.tournament.premium,
-              startTime: this.tournament.startTime,
+                startTime: this.tournament.startTime,
+                image: this.tournament.image,
                 players: this.tournament.players
             }
             tournamentService.createTournament(data)
@@ -184,6 +232,7 @@ export default {
                     this.tournament.id = response.data.id
                     console.log(response.data)
                     this.submitted = true
+                    this.selectedFile = null
                     this.refreshList()
                 })
                 .catch(e => {
@@ -196,13 +245,16 @@ export default {
       },
       handleMode(event) {
           this.mode = event.target.value
+        },
+        handleLevel(event) {
+          this.level = event.target.value
       },
 
       getAllTournaments() {
             tournamentService.findAllTournaments(this.currentPage,this.searchTitle, this.pageSize)
                 .then((response) => {
                     this.tournamentsPaginated = response.data
-                    console.log(response.data)
+                    // console.log(response.data)
                     this.totalPages = this.tournamentsPaginated.totalPages
                     this.tournaments = this.tournamentsPaginated.tournaments
                     this.totalItems = this.tournamentsPaginated.totalItems
@@ -317,11 +369,43 @@ export default {
       },
         closePopup() {
           this.isPopupVisible = false
+        },
+       
+        selectImage() {
+            this.currentImage = this.$refs.file.files.item(0)
+            console.log(this.currentImage.name);
+            this.previewImage = URL.createObjectURL(this.currentImage)
+            this.progress = 0
+            this.message = ""
+        },
+
+        upload() {
+            this.progress = 0
+
+            uploadFileService.upload(this.currentImage, (event) => {
+                this.progress = Math.round((100 * event.loaded) / event.total)
+            })
+                .then((response) => {
+                    console.log(response.data.message)
+                return uploadFileService.getFiles()
+                })
+                .then((images) => {
+                this.imageInfos = images.data
+                })
+                .catch((err) => {
+                    this.progress = 0
+                    this.message = "Could not upload image!" + err
+                    this.currentImage = undefined
+            })
         }
      
     },
     mounted() {
         this.getAllTournaments()
+        uploadFileService.getFiles().then(response => {
+            this.imageInfos = response.data
+            console.log(this.imageInfos);
+        })
     },
     computed: {
         currentUser() {
@@ -386,6 +470,15 @@ export default {
 }
 
 #tournament-mode{
+    margin-left: 1em;
+    background-color: #1a1a1d;
+    color: white;
+    border: 1px solid;
+    border-color: #6f2232;
+    float: right;
+}
+
+#tournament-level{
     margin-left: 1em;
     background-color: #1a1a1d;
     color: white;
@@ -514,5 +607,14 @@ selected-transition-enter-active
     margin-top: 2em;
 }
 
+#preview img {
+  width: 2em;
+  height: 2em;
+}
+
+.preview-image{
+    width: 2em;
+  height: 2em; 
+}
 
 </style>

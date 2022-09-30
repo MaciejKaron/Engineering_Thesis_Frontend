@@ -26,6 +26,7 @@
     "socket.io-client": "^4.5.1",
     "vee-validate": "^4.5.11",
     "vue": "^3.2.13",
+    "vue-country-flag-next": "^2.3.2",
     "vue-moment": "^4.1.0",
     "vue-router": "^4.0.15",
     "vue-toast-notification": "3.0",

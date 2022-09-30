@@ -13,6 +13,10 @@
     <h2>{{thisUserInfo.nickname}}</h2>
     </div>
 
+    <div class="user-country">
+      <country-flag :country=thisCurrentUser.faceitCountry size='big' id="player-country"/>
+    </div>
+
     <div class="user-skill" :class="{red: thisStats.skill_level == 10, orange: thisStats.skill_level >= 4 && thisStats.skill_level < 10, green: thisStats.skill_level > 0 && thisStats.skill_level < 4}">
     <h4>Skill level: {{thisStats.skill_level}}</h4>
     </div>
@@ -137,11 +141,13 @@ export default {
         .then(response => {
           this.thisUserInfo = response.data
           this.thisStats = response.data.games.csgo
-          // console.log(this.thisStats);
+          // console.log(this.thisUserInfo);
         })
         .then(() => {
           var data = {
-            faceitAvatar: this.thisUserInfo.avatar
+            faceitAvatar: this.thisUserInfo.avatar,
+            faceitLevel: this.thisStats.skill_level,
+            faceitCountry: this.thisUserInfo.country,
           }
           userService.updateUser(this.thisCurrentUser._id, data)
         })
@@ -172,7 +178,9 @@ export default {
       var data = {
         faceitVerified: false,
         faceitNickname: "",
-        faceitAvatar: ""
+        faceitAvatar: "",
+        faceitLevel: "",
+        faceitCountry: "",
       }
       userService.updateUser(this.thisCurrentUser._id, data)
         .then(response => {
@@ -227,7 +235,7 @@ export default {
     margin-bottom: auto;
     margin-left: auto;
     max-width: 16em;
-    height: 16em;
+    height: 18em;
     border-radius: 5%;
     -webkit-box-shadow:0px 1px 1px #950740;
     -moz-box-shadow:0px 1px 1px #950740;

@@ -1,5 +1,4 @@
 <template>
-<div class="main">
     <div class="tournament-searcher">
         <div class="input-tournament inline">
         <input type="text" class="form-control input-tournament-name" placeholder="Search by title" v-model="searchTitle" />
@@ -7,7 +6,7 @@
         <div class="input-button inline">
         <button class="btn btn-outline-dark" type="button" @click="filteredTitle">Search</button>
     </div>
-        <div class="tournament-pagination inline">
+        <!-- <div class="tournament-pagination inline">
             Items per Page:
             <select class="select-item" v-model="pageSize" @change="handlePageSizeChange($event)">
             <option class="selected-item" v-for="size in pageSizes" :key="size" :value="size"> {{ size }}</option>
@@ -22,22 +21,111 @@
             </div>
           </div>  
         </div>
+    </div> -->
     </div>
+<div class="main">
+    <div class="pagination-wrapper inline">
+        <button class="pagination-button" @click="previousPage();"><font-awesome-icon icon="arrow-left" /></button>
     </div>
-    <div class="row main-row">
-            <div class="col-sm-3 startTime">
-                Start Time 
+    <transition name="tournament-list-transition">
+        <div class="tournament-list-box" v-if="changePage == false">
+    <div class="tournaments-list" 
+        :class="{ active: index == currentIndex && isActive}"
+        v-for="(tournament,index) in tournaments"
+        :key="index"
+        @click="setActiveTournament(tournament,index)">
+        <div class="tournament-box">
+            <div class="row row-picture">
+                <div class="col">
+                    <img class="tournament-image" v-if="tournament.image"  :src="tournament.image" />
+                    <img class="tournament-image" v-if="tournament.image == '' " :src="require('@/assets/tournament-banner.jpg')" />
+                </div>
             </div>
-            <div class="col-sm-3 title">
-                Title
+            <div class="row row-title">
+                <div class="col">
+                    {{tournament.title}}
+                </div>
             </div>
-            <div class="col-sm-3 mode">
-                Mode
+            <div class="row row-startTime">
+                <div class="col">
+                    Start Time (UTC + 2)
+                    <br>
+                    {{displayDate(tournament.startTime)}}
+                </div>
             </div>
-            <div class="col-sm-3 premium">
-                Premium
+            <div class="row row-details-titles">
+                <div class="col col-md-3">
+                    <p> Slots <font-awesome-icon icon="people-group" /> </p>
+                </div>
+                <div class="col col-sm-3">
+                    <p> Mode </p>
+                </div>
+                <div class="col col-sm-3">
+                    <p> Level </p>
+                </div>
+                <div class="col col-sm-3">
+                    <p> Status </p>
+                </div>
+            </div>
+            <div class="row row-details">
+                <div class="col col-md-3">
+                <div class="tournament-players" v-if="tournament.mode == '1v1'">
+                    {{tournament.players.length}} / 32
+                </div>
+                <div class="tournament-teams" v-if="tournament.mode == '5v5'">
+                    {{tournament.teams.length}} / 8
+                </div>
+                </div>
+                <div class="col col-sm-3">
+                    {{tournament.mode}}
+                </div>
+                <div class="col col-sm-3">
+                    {{tournament.level}}
+                </div>
+                <div class="col col-sm-3">
+                    {{tournament.premium ? "Premium" : "Free"}}
+                </div>
+            </div>
+            <div class="row row-buttons" v-if="currentTournament">
+                <div class="col">
+                    <div class="1v1" v-if="currentTournament.mode == '1v1' && currentTournament._id == tournament._id">
+                    <button class="join-button" v-if="!currentTournament.players.includes(thisCurrentUser._id)" @click="joinUserToTournament()"><span>JOIN SOLO</span></button>
+                    <button class="leave-button" v-if="currentTournament.players.includes(thisCurrentUser._id)" @click="rejoinUserFromTournament()">LEAVE</button>
+                    <button class="leave-button">LADDER</button>
+                </div>
+                <div class="5v5" v-if="currentTournament.mode == '5v5' && currentTournament._id == tournament._id">
+                    <button class="join-button" v-if="!currentTournament.teams.includes(thisCurrentUser.team.toString())" @click="joinTeamToTournament()">JOIN WITH TEAM</button>
+                    <button class="leave-button" v-if="currentTournament.teams.includes(thisCurrentUser.team.toString())" @click="rejoinTeamFromTournament()">LEAVE</button>
+                    <button class="leave-button">LADDER</button>
+                </div>
+                </div>
             </div>
         </div>
+    </div>
+    </div>
+    </transition>
+        <div class="pagination-wrapper inline">
+            <button class="pagination-button" @click="nextPage();"><font-awesome-icon icon="arrow-right" /></button>
+        </div>
+    <!-- <div class="row main-row">
+            <div class="col-sm-3 startTime">
+                Start Time (UTC + 2)
+            </div>
+            <div class="col-sm-4 title">
+                Title
+            </div>
+            <div class="col-sm-1 mode">
+                Mode
+            </div>
+            <div class="col-sm-2 level">
+                Level
+            </div>
+            <div class="col-sm-2 premium">
+                Requirements
+            </div>
+        </div> -->
+        <!-- <transition name="tournament-list-transition">
+        <div class="tournament-list-box" v-if="changePage == false">
     <div class="tournament-list" 
         :class="{ active: index == currentIndex && isActive}"
         v-for="(tournament,index) in tournaments"
@@ -47,13 +135,16 @@
             <div class="col-sm-3 startTime">
                 {{displayDate(tournament.startTime)}} 
             </div>
-            <div class="col-sm-3 title">
+            <div class="col-sm-4 title">
                 {{tournament.title}}
             </div>
-            <div class="col-sm-3 mode">
+            <div class="col-sm-1 mode">
                 {{tournament.mode}}
             </div>
-            <div class="col-sm-3 premium">
+            <div class="col-sm-2 level">
+                {{tournament.level}}
+            </div>
+            <div class="col-sm-2 premium">
                 {{tournament.premium ? "Premium" : "Free"}}
             </div>
             <transition name="selected-transition">
@@ -63,7 +154,7 @@
                 </div>
                 <div class="tournament-players" v-if="currentTournament.mode == '1v1'">
                     <font-awesome-icon icon="people-group" />   Players: {{tournament.players.length}} / 32
-                    <button @click="showPopup()">Check</button>
+                    <button class="join-button" @click="showPopup()">Check</button>
                 </div>
                 <div class="tournament-teams" v-if="currentTournament.mode == '5v5'">
                     <font-awesome-icon icon="people-group" />   Teams: {{tournament.teams.length}} / 8
@@ -82,10 +173,15 @@
             </transition>
         </div>
     </div>
-    <div class="tournament-list-page">
+</div>
+</transition> -->
+    <!-- <div class="tournament-list-page">
         Page: {{currentPage + 1}} / {{totalPages}}
-    </div>
-</div> 
+    </div> -->
+</div>
+<div class="tournament-list-page">
+        Page: {{currentPage + 1}} / {{totalPages}}
+    </div> 
 <Popup
             v-show="isPopupVisible"
             @close="closePopup()"
@@ -158,8 +254,8 @@ export default {
             tournaments: [],
             currentTournament: null,
             currentIndex: -1,
-            pageSize: 5,
-            pageSizes: [5, 10, 15, 20],
+            pageSize: 3,
+            pageSizes: [3, 6, 9, 12, 15, 18],
             tournamentsPaginated: [],
             searchTitle: "",
             currentPage: 0,
@@ -174,6 +270,7 @@ export default {
             thisUser: null,
             currentUserIndex: -1,
             thisStats: [],
+            changePage: false,
         }
     },
     methods: {
@@ -194,6 +291,10 @@ export default {
             if (!(this.currentPage === this.totalPages - 1)) {
                 this.currentPage++
                 this.getAllPublishedTournaments()
+                this.changePage = true
+                this.$nextTick(function () {
+                    this.changePage = false
+                })
             }
             this.currentIndex = -1
         },
@@ -201,6 +302,10 @@ export default {
             if (!(this.currentPage === 0)) {
                 this.currentPage--
                 this.getAllPublishedTournaments()
+                this.changePage = true
+                this.$nextTick(function () {
+                    this.changePage = false
+                })
              }
              this.currentIndex = -1
         },
@@ -351,7 +456,7 @@ export default {
             userService.findOneUser(id)
                 .then(response => {
                     this.thisCurrentUser = response.data
-                // console.log(response.data)
+                // console.log(this.thisCurrentUser);
                 })
                 .catch(e => {
                 console.log(e)
@@ -361,6 +466,25 @@ export default {
             if (value) {
                  return moment(String(value)).format('MM/DD/YYYY hh:mm a')
             }
+            // if (this.currentUser.faceitCountry == 'ar') {
+            //     if (value) {
+            //         return moment(String(value)).utcOffset('-0300').format('MM/DD/YYYY hh:mm a')
+            //     }
+            // }
+            // if (this.currentUser.faceitCountry == 'pl') {
+            //     if (value) {
+            //         return moment(String(value)).utcOffset('+0200').format('MM/DD/YYYY hh:mm a')
+            //     }
+            // }
+            // if (this.currentUser.faceitCountry == 'ru') {
+            //     if (value) {
+            //         return moment(String(value)).utcOffset('+0300').format('MM/DD/YYYY hh:mm a')
+            //     }
+            // } else {
+            //     if (value) {
+            //         return moment(String(value)).utc().format('MM/DD/YYYY hh:mm a')
+            //     } 
+            // }
         },
         log(message) {
             console.log(message)
@@ -400,35 +524,89 @@ export default {
     },
     },
     created() {
-        // var test = document.body;
-        // test.style.backgroundImage = `url(${image})`
+        var test = document.body;
+        test.style.backgroundImage = `url(${require('@/assets/background6.png')})`
         // test.style.backgroundPosition = "center"
-
-        document.body.style.backgroundColor = "#303033"
+        
+        // document.body.style.backgroundColor = "#303033"
   },
 }
 </script>
 
 <style scoped>
-/* .list {
-  text-align: left;
-  max-width: 750px;
-  margin: auto;
-} */
-
+.tournament-searcher{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: roboto;
+    margin-top: 5em;
+}
 
 .main{
-    width: 60em;
+    /* max-width: 80em; */
     /* margin top,right,bottom,left */
-    margin-top: 6em;
+    /* margin-top: 6em;
     margin-right: auto;
     margin-bottom: 0;
-    margin-left: auto;
+    margin-left: auto; */
+    height: 36em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: white;
     font-family: roboto;
 }
 
-.tournament-list{
+.tournament-list-box{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 500ms ease-in-out;
+}
+
+.tournaments-list{
+    height: 28em;
+    width: 24em;
+    margin-right: 2em;
+    margin-left: 2em;
+    background-color: #1a1a1d;
+    text-align: center;
+    box-shadow: 0px 0px 12px 1px #950740;
+}
+
+.row-picture{
+    height: 12em;
+}
+
+.row-title{
+    margin : 0;
+    margin-top: 1em;
+    background-color: #c3073f;
+}
+
+.row-startTime{
+    margin-top: 1em;
+}
+
+.row-details-titles{
+    margin-top: 1em;
+}
+
+.row-buttons{
+    margin-top: 2em;
+}
+
+.active{
+    box-shadow:0px 0px 24px 1px #c3073f;
+}
+
+.tournament-image{
+    width: 24em;
+    height: 12em;
+}
+
+/* .tournament-list{
     height: 6em;
     cursor: pointer;
     transition: all 300ms ease-in-out;
@@ -439,22 +617,15 @@ export default {
 
 .main-row{
     text-align: center;
-}
+} */
 
 /* .selected{
     background-color: rgb(56, 56, 56);
 } */
 /* #c3073f #950740 #6f2232 */
-.active{
-    background-color: #1a1a1d;
-    border: 1px solid #6f2232;
-    -webkit-box-shadow:0px 1px 1px #950740;
-    -moz-box-shadow:0px 1px 1px #950740;
-    box-shadow:6px 6px 6px #c3073f;
-    height: 8em;
-}
 
-.selected-transition-enter-from
+
+/* .selected-transition-enter-from
 .selected-transition-leave-to{
     transform: translateY(20px);
     opacity: 0;
@@ -463,7 +634,7 @@ export default {
 selected-transition-enter-active
 .selected-transition-leave-active{
     transition: all 0.5s ease-out;
-}
+} */
 
 .join-button {
   background-color: #6f2232;
@@ -528,7 +699,8 @@ selected-transition-enter-active
     color: white;
     background-color: #1a1a1d;
     border-color: #6f2232;
-    margin-left: 1em;
+    width: 4em;
+    height: 4em;
  }
 
  .select-item{
@@ -538,7 +710,7 @@ selected-transition-enter-active
     border-color: #6f2232;
  }
 
-.tournament-extend{
+/* .tournament-extend{
     width: 90%;
 }
 
@@ -559,13 +731,14 @@ selected-transition-enter-active
 
  .selected-row{
     float: right;
- }
+ } */
 
  .tournament-list-page{
-    float: right;
+    color: white;
+    text-align: center;
  }
 
- .tournament-player-avatar{
+ /* .tournament-player-avatar{
     max-width: 2em;
   max-height: 2em;
   border-radius: 50%;
@@ -590,5 +763,20 @@ selected-transition-enter-active
  .second-row{
     margin-top: 0.5em;
  }
+
+ .tournament-list-box{
+    transition: all 500ms ease-in-out;
+ } */
+
+ .tournament-list-transition-enter-from,
+.tournament-list-transition-leave-to{
+    transform: translateX(-20px);
+    opacity: 0;
+}
+
+.tournament-list-transition-enter-active
+.tournament-list-transition-leave-active{
+    transition: all 0.5s ease-out;
+}
 
 </style>
