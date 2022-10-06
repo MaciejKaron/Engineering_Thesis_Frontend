@@ -70,7 +70,7 @@
             <div class="row row-details">
                 <div class="col col-md-3">
                 <div class="tournament-players" v-if="tournament.mode == '1v1'">
-                    {{tournament.players.length}} / 32
+                    {{tournament.players.length}} / 16
                 </div>
                 <div class="tournament-teams" v-if="tournament.mode == '5v5'">
                     {{tournament.teams.length}} / 8
@@ -91,12 +91,12 @@
                     <div class="1v1" v-if="currentTournament.mode == '1v1' && currentTournament._id == tournament._id">
                     <button class="join-button" v-if="!currentTournament.players.includes(thisCurrentUser._id)" @click="joinUserToTournament()"><span>JOIN SOLO</span></button>
                     <button class="leave-button" v-if="currentTournament.players.includes(thisCurrentUser._id)" @click="rejoinUserFromTournament()">LEAVE</button>
-                    <button class="leave-button">LADDER</button>
+                    <button class="leave-button" @click="goToInfo()">LADDER</button>
                 </div>
                 <div class="5v5" v-if="currentTournament.mode == '5v5' && currentTournament._id == tournament._id">
                     <button class="join-button" v-if="!currentTournament.teams.includes(thisCurrentUser.team.toString())" @click="joinTeamToTournament()">JOIN WITH TEAM</button>
                     <button class="leave-button" v-if="currentTournament.teams.includes(thisCurrentUser.team.toString())" @click="rejoinTeamFromTournament()">LEAVE</button>
-                    <button class="leave-button">LADDER</button>
+                    <button class="leave-button" @click="goToInfo()">LADDER</button>
                 </div>
                 </div>
             </div>
@@ -339,7 +339,7 @@ export default {
                                 const { skill_level, faceit_elo } = responsev2.data.games.csgo
                                 const { _id, username, faceitAvatar} = response.data
                                 this.tournamentPlayers.push({_id, username, faceitAvatar, skill_level, faceit_elo})
-                                console.log(this.tournamentPlayers);      
+                                // console.log(this.tournamentPlayers);      
                         })
                 })
             }
@@ -506,7 +506,10 @@ export default {
         },
         goToProfile() {
           this.$router.push({name:'UserProfile', params: {id: this.thisUser._id}});
-    },
+        },
+        goToInfo() {
+          this.$router.push({name:'tournamentInfo', params: {id: this.currentTournament._id}});
+        },
     },
     mounted() {
         this.getAllPublishedTournaments()
@@ -526,6 +529,7 @@ export default {
     created() {
         var test = document.body;
         test.style.backgroundImage = `url(${require('@/assets/background6.png')})`
+        test.style.backgroundPosition = "none"
         // test.style.backgroundPosition = "center"
         
         // document.body.style.backgroundColor = "#303033"

@@ -504,7 +504,7 @@ display: inline-block;
 }
 
 .notification{
-  color: rgb(251, 65, 65);
+  color: rgb(251, 65, 65) !important;
 }
 
 .chat-transition-enter-from,

@@ -46,8 +46,8 @@
                 </div>
                
                 <div class="form-group">
-                    <input type="file" accept="image/*" ref="file" @change="selectImage" />
-                    <button :disabled="!currentImage" @click="upload">Upload</button>
+                    <input type="file" accept="image/*" ref="file" class="input-file" @change="selectImage" />
+                    <button :disabled="!currentImage" class="add-buttons" @click="upload">Upload</button>
                     <div v-if="currentImage" class="progress">
                         <div
                             class="progress-bar progress-bar-info"
@@ -62,7 +62,7 @@
                     </div>
                     <div v-if="previewImage">
                         <div>
-                            <img class="preview-image" :src="previewImage" alt="" />
+                            <img class="preview-image" v-if="currentImage" :src="previewImage" alt="" />
                         </div>
                     </div>
                 </div>
@@ -210,10 +210,12 @@ export default {
     },
     methods: {
         saveTournament() {
-            for (let i = 0; i < this.imageInfos.length; i++){
-                if (this.currentImage.name == this.imageInfos[i].name) {
-                    this.selectedFile = this.imageInfos[i].url
-                    this.tournament.image = this.selectedFile
+            if (this.currentImage != undefined) {
+                for (let i = 0; i < this.imageInfos.length; i++) {
+                    if (this.currentImage.name == this.imageInfos[i].name) {
+                        this.selectedFile = this.imageInfos[i].url
+                        this.tournament.image = this.selectedFile
+                    }
                 }
             }
             var data = {
@@ -233,6 +235,7 @@ export default {
                     console.log(response.data)
                     this.submitted = true
                     this.selectedFile = null
+                    this.currentImage = undefined
                     this.refreshList()
                 })
                 .catch(e => {
@@ -413,7 +416,9 @@ export default {
         }
     },
     created() {
-        document.body.style.backgroundColor = "#303033"
+        // document.body.style.backgroundColor = "#303033"
+        var test = document.body;
+        test.style.backgroundImage = `url(${require('@/assets/background6.png')})`
   },
 }
 </script>
@@ -616,5 +621,14 @@ selected-transition-enter-active
     width: 2em;
   height: 2em; 
 }
+
+.progress{
+    margin-top: 0.5em;
+}
+
+.progress-bar{
+    background-color: #c3073f !important;
+}
+
 
 </style>

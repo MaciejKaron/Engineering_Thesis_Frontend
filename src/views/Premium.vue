@@ -97,7 +97,9 @@ export default {
         this.getOneUser(this.currentUser._id)
     },
     created() {
-    document.body.style.backgroundColor = "#303033";
+    // document.body.style.backgroundColor = "#303033";
+    var test = document.body;
+        test.style.backgroundImage = `url(${require('@/assets/background6.png')})`
   },
 }
 </script>

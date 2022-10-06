@@ -19,6 +19,7 @@ const myTeam = () => import("./views/myTeam")
 const TeamProfile = () => import("./views/TeamProfile")
 const Ranking = () => import("./views/Ranking")
 const PremiumSuccess = () => import("./views/PremiumSuccess")
+const TournamentInfo = () => import("./views/TournamentInfo")
 
 const routes = [
     {
@@ -116,6 +117,13 @@ const routes = [
         name: "success",
         //lazy-loaded
         component: PremiumSuccess,
+    },
+
+    {
+        path: "/tournament/info/:id",
+        name: "tournamentInfo",
+        // lazy-loaded
+        component: TournamentInfo,
     },
       
 ]

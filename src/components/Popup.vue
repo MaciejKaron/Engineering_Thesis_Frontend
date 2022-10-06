@@ -93,16 +93,14 @@
     .modal-header,
     .modal-footer {
       padding: 15px;
-      display: flex;
+      /* display: flex; */
     }
   
     .modal-header {
-      position: relative;
       border-bottom: 1px solid #eeeeee;
-      color: #4AAE9B;
-      justify-content: space-between;
       color: white;
       font-family: roboto;
+      text-align: center !important;
     }
   
     .modal-footer {

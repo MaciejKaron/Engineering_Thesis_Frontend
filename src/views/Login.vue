@@ -58,15 +58,22 @@ export default {
     },
     created() {
         if (this.loggedIn) {
-            this.$router.push('/profile')
-        }
+            this.$router.push('/home')
+      }
+
+      var test = document.body;
+      test.style.backgroundImage = `url(${require('@/assets/backgroundCT2.jpg')})`
+      test.style.backgroundPosition = "left"
     },
     methods: {
         handleLogin(user) {
             this.loading = true
             this.$store.dispatch('auth/login', user).then(
                 () => {
-                    this.$router.push('/home')
+                this.$router.push('/home')
+                  .then(() => {
+                    window.location.reload();
+                    })
                 },
                 (error) => {
                     this.loading = false
@@ -97,7 +104,7 @@ justify-content: center;
   width: 24em;
   height: 24em;
   padding: 40px 40px;
-  background-color: #1a1a1d;
+  background-color: rgb(26,26,29, 0.5);
   color: white;
   box-shadow:0px 0px 12px 1px #c3073f;
 }
