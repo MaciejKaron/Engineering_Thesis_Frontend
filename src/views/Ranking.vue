@@ -1,7 +1,6 @@
 <template>
     <h2 class="title">Global Ranking</h2>
     <div class="your-stats">
-        <h4>Your stats:</h4>
         <p v-if="thisCurrentUser.faceitVerified == true">
             <img class="ranking-avatar" v-if="thisCurrentUser.faceitAvatar != '' " :src="thisCurrentUser.faceitAvatar" />
             <img class="ranking-avatar" v-if="thisCurrentUser.faceitAvatar == '' || thisCurrentUser.faceitAvatar == undefinied " :src="require('@/assets/unknown.jpg')" />
@@ -29,7 +28,7 @@
                     </th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="table-rows">
                 <tr v-for="(stats, index) in rankingStats" :key="stats">
                     <td>
                         {{index + 1}}
@@ -118,6 +117,30 @@ export default {
 </script>
 
 <style scoped>
+
+/* .ranking{
+    max-height: 72vh;
+    overflow: auto;
+} */
+
+table ,tr td{
+    border: 0px solid #000
+}
+tbody {
+    display:block;
+    max-height:31em;
+    overflow-y:scroll;
+}
+thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;
+}
+thead {
+    width: calc( 100% - 0.6em )/* scrollbar is average 1em/16px width, remove it from thead width */
+}
+
+
 .title{
     color: white;
     text-align: center;

@@ -14,6 +14,14 @@ class MatchService {
     findThisTournamentMatches(id) {
         return axios.get(API_URL + `matches/tournament/${id}`)
     }
+
+    cleareThisTournamentMatches(id) {
+        return axios.delete(API_URL + `matches/delete/${id}`)
+    }
+
+    deleteThisMatch(id) {
+        return axios.delete(API_URL + `match/delete/this/${id}`)
+    }
 }
 
 export default new MatchService()

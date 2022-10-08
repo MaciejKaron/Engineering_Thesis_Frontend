@@ -1,8 +1,4 @@
 <template>
-    <h3 class="tournament-title" style="text-align: center; color: white">
-    {{currentTournament.title}}
-    </h3>
-
     <div class="tournament1v1" v-if="currentTournament.mode == '1v1'">
         <div class="first-bracket">
             <h4 class="title">Round 1</h4>
@@ -134,7 +130,7 @@
                 </div>
             </div>
         </div>
-        <Popup
+        <TournamentPopup
                     v-if="isPopupVisible"
                     @close="closePopup()"
                     >
@@ -168,34 +164,52 @@
                             <option v-for="m in mapPool" :key="m" :value="m">{{m}}</option>
                             </select>
                         </div>
+                        <div class="popup-options">
                         <button @click="kickUserFromTournament(); closePopup()" class="match-options-button kick">Kick</button>
-                        <button @click="goToStage2(); closePopup()" class="match-options-button" v-if="!currentTournament.stage.stage2.includes(thisPlayer._id) && !currentTournament.stage.stage3.includes(thisPlayer._id) && !currentTournament.stage.stage4.includes(thisPlayer._id) && !currentTournament.stage.stage5.includes(thisPlayer._id)">Submit</button>
-                        <button @click="goToStage3(); closePopup()" class="match-options-button" v-if="currentTournament.stage.stage2.includes(thisPlayer._id) && !currentTournament.stage.stage3.includes(thisPlayer._id) && !currentTournament.stage.stage4.includes(thisPlayer._id) && !currentTournament.stage.stage5.includes(thisPlayer._id)">Submit</button>
-                        <button @click="goToStage4(); closePopup()" class="match-options-button" v-if="currentTournament.stage.stage3.includes(thisPlayer._id) && !currentTournament.stage.stage4.includes(thisPlayer._id) && !currentTournament.stage.stage5.includes(thisPlayer._id)">Submit</button>
-                        <button @click="goToStage5(); closePopup()" class="match-options-button" v-if="currentTournament.stage.stage4.includes(thisPlayer._id) && !currentTournament.stage.stage5.includes(thisPlayer._id)">Submit</button>
+                        <button @click="backToStage1(); closePopup()" class="match-options-button undo" v-if="currentTournament.stage.stage2.includes(thisPlayer._id) && !currentTournament.stage.stage3.includes(thisPlayer._id) && !currentTournament.stage.stage4.includes(thisPlayer._id) && !currentTournament.stage.stage5.includes(thisPlayer._id)">Undo2</button>
+                        <button @click="backToStage2(); closePopup()" class="match-options-button undo" v-if="currentTournament.stage.stage3.includes(thisPlayer._id) && !currentTournament.stage.stage4.includes(thisPlayer._id) && !currentTournament.stage.stage5.includes(thisPlayer._id)">Undo3</button>
+                        <button @click="backToStage3(); closePopup()" class="match-options-button undo" v-if="currentTournament.stage.stage4.includes(thisPlayer._id) && !currentTournament.stage.stage5.includes(thisPlayer._id)">Undo4</button>
+                        <button @click="backToStage4(); closePopup()" class="match-options-button undo" v-if="currentTournament.stage.stage5.includes(thisPlayer._id)">Undo5</button>
+                        <button @click="goToStage2(); closePopup()" :disabled="!match.opponent || match.playerStats.kills == '' || match.playerStats.deaths == '' || match.map == '' " class="match-options-button" v-if="!currentTournament.stage.stage2.includes(thisPlayer._id) && !currentTournament.stage.stage3.includes(thisPlayer._id) && !currentTournament.stage.stage4.includes(thisPlayer._id) && !currentTournament.stage.stage5.includes(thisPlayer._id)">Submit</button>
+                        <button @click="goToStage3(); closePopup()" :disabled="!match.opponent || match.playerStats.kills == '' || match.playerStats.deaths == '' || match.map == '' " class="match-options-button" v-if="currentTournament.stage.stage2.includes(thisPlayer._id) && !currentTournament.stage.stage3.includes(thisPlayer._id) && !currentTournament.stage.stage4.includes(thisPlayer._id) && !currentTournament.stage.stage5.includes(thisPlayer._id)">Submit</button>
+                        <button @click="goToStage4(); closePopup()" :disabled="!match.opponent || match.playerStats.kills == '' || match.playerStats.deaths == '' || match.map == '' " class="match-options-button" v-if="currentTournament.stage.stage3.includes(thisPlayer._id) && !currentTournament.stage.stage4.includes(thisPlayer._id) && !currentTournament.stage.stage5.includes(thisPlayer._id)">Submit</button>
+                        <button @click="goToStage5(); closePopup()" :disabled="!match.opponent || match.playerStats.kills == '' || match.playerStats.deaths == '' || match.map == '' " class="match-options-button" v-if="currentTournament.stage.stage4.includes(thisPlayer._id) && !currentTournament.stage.stage5.includes(thisPlayer._id)">Submit</button>
+                        </div>
                     </template>
 
                     <template v-slot:footer>
                     <!-- This is a new modal footer. -->
                     </template>
-                </Popup>
+                </TournamentPopup>
     </div>
-    <div class="matchHistory" v-for="(match,index) in matchHistory" :key="index">
+    <div class="matchHistory-box">
+    <div class="history-info">
+        <div class="history-header">Match history</div>
+        <button class="match-options-button history-button" @click="cleareHistory()" v-if="showAdminBoard || showModeratorBoard">Clear history</button>
+    </div>
+    <div class="matchHistory" v-for="(match,index) in matchHistory" :key="index"
+        @click="setActiveMatch(match, index)">
         <div class="match-info">
-                    {{index + 1}}. {{match.player}} {{match.isWin ? "Win" : "Lose"}} with {{match.opponent}} | Stats: Kills:{{match.playerStats.kills}} Deaths:{{match.playerStats.deaths}} | Map: {{match.map}}
+                    {{index + 1}}. {{match.player.playerUsername}} {{match.isWin ? "Win" : "Lose"}} with {{match.opponent.opponentUsername}} | Stats: Kills:{{match.playerStats.kills}} Deaths:{{match.playerStats.deaths}} | Map: {{match.map}}
+            <div class="match-history-options" v-if="(thisMatch._id == match._id) && (showAdminBoard || showModeratorBoard)">
+                <button @click="deleteThisMatch()" class="match-options-button match-delete-button">X</button>
+            </div>
         </div>
+    </div>
     </div>
 </template>
 
 <script>
 import tournamentService from "@/services/tournament.service";
 import userService from '@/services/user.service';
-import Popup from "@/components/Popup.vue";
+import TournamentPopup from "@/components/TournamentPopup.vue";
 import matchService from '@/services/match.service';
+import { useToast } from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
 export default {
     name: "TournamentInfo-comp",
     components: {
-    Popup,
+    TournamentPopup,
 },
     data() {
         return {
@@ -221,7 +235,10 @@ export default {
                 isWin: false,
             },
             mapPool: ["de_dust2", "de_nuke", "de_mirage", "de_ancient", "de_inferno", "de_overpass", "de_train", "de_vertigo"],
-            matchHistory: []
+            matchHistory: [],
+            toast: useToast(),
+            thisMatch: [],
+            currentMatchIndex: -1,
         }
     },
     methods: {
@@ -257,7 +274,7 @@ export default {
             // console.log(this.stage2Players);
 
             for (let i = 0; i < this.currentTournament.stage.stage3.length; i++){
-                userService.findOneUser(this.currentTournament.stage.stage2[i])
+                userService.findOneUser(this.currentTournament.stage.stage3[i])
                     .then(response => {
                         const { _id = response.data._id, username = response.data.username, faceitAvatar = response.data.faceitAvatar, faceitCountry = response.data.faceitCountry, faceitLevel = response.data.faceitLevel } = response.data
                         this.stage3Players.push({ _id, username, faceitAvatar, faceitCountry, faceitLevel });
@@ -266,7 +283,7 @@ export default {
             // console.log(this.stage3Players);
 
             for (let i = 0; i < this.currentTournament.stage.stage4.length; i++){
-                userService.findOneUser(this.currentTournament.stage.stage2[i])
+                userService.findOneUser(this.currentTournament.stage.stage4[i])
                     .then(response => {
                         const { _id = response.data._id, username = response.data.username, faceitAvatar = response.data.faceitAvatar, faceitCountry = response.data.faceitCountry, faceitLevel = response.data.faceitLevel } = response.data
                         this.stage4Players.push({ _id, username, faceitAvatar, faceitCountry, faceitLevel });
@@ -275,7 +292,7 @@ export default {
             // console.log(this.stage4Players);
 
             for (let i = 0; i < this.currentTournament.stage.stage5.length; i++){
-                userService.findOneUser(this.currentTournament.stage.stage2[i])
+                userService.findOneUser(this.currentTournament.stage.stage5[i])
                     .then(response => {
                         const { _id = response.data._id, username = response.data.username, faceitAvatar = response.data.faceitAvatar, faceitCountry = response.data.faceitCountry, faceitLevel = response.data.faceitLevel } = response.data
                         this.stage5Players.push({ _id, username, faceitAvatar, faceitCountry, faceitLevel });
@@ -297,6 +314,11 @@ export default {
             this.currentIndex = index;
             this.findOneUserByUsername(this.thisUser.username)
             // console.log(this.thisUser);
+        },
+        setActiveMatch(match, index) {
+            this.thisMatch = match
+            this.currentMatchIndex = index
+            console.log(this.thisMatch);
         },
         showPopup() {
           this.isPopupVisible = true
@@ -332,6 +354,7 @@ export default {
             }
             if (this.match.isWin == true) {
                 this.createMatch()
+                this.findThisTournamentMatches()
                 tournamentService.goToStage2(this.$route.params.id, data)
                     .then(response => {
                         console.log(response.data);
@@ -346,6 +369,7 @@ export default {
                     })
             } else {
                 this.createMatch()
+                this.findThisTournamentMatches()
             }
         },
 
@@ -355,6 +379,7 @@ export default {
             }
             if (this.match.isWin == true) {
                 this.createMatch()
+                this.findThisTournamentMatches()
                 tournamentService.goToStage3(this.$route.params.id, data)
                     .then(response => {
                         console.log(response.data);
@@ -370,6 +395,7 @@ export default {
                     })
             }else {
                 this.createMatch()
+                this.findThisTournamentMatches()
             }
         },
 
@@ -379,6 +405,7 @@ export default {
             }
             if (this.match.isWin == true) {
                 this.createMatch()
+                this.findThisTournamentMatches()
                 tournamentService.goToStage4(this.$route.params.id, data)
                     .then(response => {
                         console.log(response.data);
@@ -395,6 +422,7 @@ export default {
                     })
             }else {
                 this.createMatch()
+                this.findThisTournamentMatches()
             }
         },
 
@@ -404,6 +432,7 @@ export default {
             }
             if (this.match.isWin == true) {
                 this.createMatch()
+                this.findThisTournamentMatches()
                 tournamentService.goToStage5(this.$route.params.id, data)
                     .then(response => {
                         console.log(response.data);
@@ -421,18 +450,97 @@ export default {
                     })
             }else {
                 this.createMatch()
+                this.findThisTournamentMatches()
             }
         },
 
-        createMatch() {
+        backToStage1() {
             var data = {
-                tournamentId: this.$route.params.id,
-                player: this.thisPlayer._id,
-                opponent: this.match.opponent,
-                playerStats: this.match.playerStats,
-                map: this.match.map,
-                isWin: this.match.isWin,
+                _id: this.thisPlayer._id
             }
+            tournamentService.backToStage1(this.$route.params.id, data)
+                .then(response => {
+                    console.log(response.data);
+                    this.currentTournamentPlayers = []
+                    this.stage2Players = []
+                })
+                .then(() => {
+                this.getOneTournament(this.$route.params.id)
+                })
+                .catch(e => {
+                console.log(e);
+            })
+        },
+
+        backToStage2() {
+            var data = {
+                _id: this.thisPlayer._id
+            }
+            tournamentService.backToStage2(this.$route.params.id, data)
+                .then(response => {
+                    console.log(response.data);
+                    this.currentTournamentPlayers = []
+                    this.stage2Players = []
+                    this.stage3Players = []
+                })
+                .then(() => {
+                this.getOneTournament(this.$route.params.id)
+                })
+                .catch(e => {
+                console.log(e);
+            })
+        },
+
+        backToStage3() {
+            var data = {
+                _id: this.thisPlayer._id
+            }
+            tournamentService.backToStage3(this.$route.params.id, data)
+                .then(response => {
+                    console.log(response.data);
+                    this.currentTournamentPlayers = []
+                    this.stage2Players = []
+                    this.stage3Players = []
+                    this.stage4Players = []
+                })
+                .then(() => {
+                this.getOneTournament(this.$route.params.id)
+                })
+                .catch(e => {
+                console.log(e);
+            })
+        },
+
+        backToStage4() {
+            var data = {
+                _id: this.thisPlayer._id
+            }
+            tournamentService.backToStage4(this.$route.params.id, data)
+                .then(response => {
+                    console.log(response.data);
+                    this.currentTournamentPlayers = []
+                    this.stage2Players = []
+                    this.stage3Players = []
+                    this.stage4Players = []
+                    this.stage5Players = []
+                })
+                .then(() => {
+                this.getOneTournament(this.$route.params.id)
+                })
+                .catch(e => {
+                console.log(e);
+            })
+        },
+
+        createMatch() {
+                var data = {
+                    tournamentId: this.$route.params.id,
+                    player: ({ playerId: this.thisPlayer._id, playerUsername: this.thisPlayer.username }),
+                    opponent: ({ opponentId: this.match.opponent._id, opponentUsername: this.match.opponent.username }),
+                    playerStats: this.match.playerStats,
+                    map: this.match.map,
+                    isWin: this.match.isWin,
+                }
             matchService.createMatch(data)
                 .then(response => {
                 console.log(response.data);
@@ -446,7 +554,13 @@ export default {
                 this.match.isWin = false
                 })
                 .catch(e => {
-                console.log(e)
+                    console.log(e)
+                    this.toast.open({
+                        message: e.response.data.message,
+                        type: 'error',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
             })
         },
         handleOpponent(event) {
@@ -468,7 +582,24 @@ export default {
                     console.log(response.data);
                     this.matchHistory = response.data
             })
-        }
+        },
+        cleareHistory() {
+            matchService.cleareThisTournamentMatches(this.$route.params.id)
+                .then(response => {
+                    console.log(response.data);
+                    this.findThisTournamentMatches()
+                })
+                .catch(e => {
+                console.log(e)
+            })
+        },
+        deleteThisMatch() {
+            matchService.deleteThisMatch(this.thisMatch._id)
+                .then(response => {
+                    console.log(response.data);
+                    this.findThisTournamentMatches()
+          })  
+        },
     },
     mounted() {
         this.getOneTournament(this.$route.params.id) 
@@ -623,11 +754,12 @@ export default {
 
 #popup-player{
     color: white;
+    text-align: center;
 }
 
 #match-checkbox {
     accent-color: #6f2232;
-    margin-left: 2em;
+    margin-left: 5em;
 }
 
 #match-opponent{
@@ -654,7 +786,7 @@ export default {
     max-width: 4em;
     text-align: center;
     display: inline-block;
-    margin-left: 2em;
+    margin-left: 3em;
 }
 
 #match-deaths{
@@ -665,7 +797,7 @@ export default {
     max-width: 4em;
     text-align: center;
     display: inline-block;
-    margin-left: 1em;
+    margin-left: 2.1em;
 }
 label{
     float: left;
@@ -691,7 +823,54 @@ label{
     margin-right: 1em;
 }
 
+.undo {
+    margin-right: 1em;
+}
+
 .match-info{
     color: white;
+    display: inline-block;
 }
+
+.matchHistory-box{
+    height: 12em;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    color: white;
+    background-color: #1a1a1d;
+    box-shadow: 0px 0px 12px 0px #c3073f ;
+    font-family: roboto;
+    overflow: auto;
+}
+
+.history-info{
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+}
+
+.history-header{
+    text-align: center;
+    display: inline-block;
+}
+
+.history-button{
+    float: right;
+}
+
+.popup-options{
+    text-align: center;
+}
+
+.match-history-options{
+    display:inline-block
+}
+
+.match-delete-button{
+    margin-left: 1em;
+}
+
 </style>

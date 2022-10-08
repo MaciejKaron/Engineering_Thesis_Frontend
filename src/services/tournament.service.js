@@ -66,6 +66,22 @@ class TournamentService {
     goToStage5(id, data) {
         return axios.post(API_URL + `tournaments/stage5/${id}`, data)
     }
+
+    backToStage1(id, data) {
+        return axios.post(API_URL + `tournaments/remove/stage2/${id}`, data)
+    }
+
+    backToStage2(id, data) {
+        return axios.post(API_URL + `tournaments/remove/stage3/${id}`, data)
+    }
+
+    backToStage3(id, data) {
+        return axios.post(API_URL + `tournaments/remove/stage4/${id}`, data)
+    }
+
+    backToStage4(id, data) {
+        return axios.post(API_URL + `tournaments/remove/stage5/${id}`, data)
+    }
 }
 
 export default new TournamentService()
