@@ -59,6 +59,76 @@
   </div>
     </div>
 
+    <div class="user-match-history" v-if="this.thisCurrentUser.faceitVerified == true">
+      <h2 style="color: white; text-align: center;">Match History</h2>
+      <div class="user-matches-list">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        Nickanme
+                    </th>
+                    <th>
+                        Kills 
+                    </th>
+                    <th>
+                        Deaths
+                    </th>
+                    <th>
+                        K/D Ratio 
+                    </th>
+                    <th>
+                        Map
+                    </th>
+                    <th>
+                        Date
+                    </th>
+                    <th>
+                        Opponent
+                    </th>
+                    <th>
+                        Result
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="table-rows">
+                <tr v-for="(match,index) in userMatchHistory" :key="index">
+                    <td>
+                        {{match.player.playerUsername}}
+                    </td>
+                    <td>
+                        {{match.playerStats.kills}}
+                    </td>
+                    <td>
+                      {{match.playerStats.deaths}}
+                    </td>
+                    <td>
+                      <div class="positive-ratio" v-if="((match.playerStats.kills/match.playerStats.deaths) >= 1)">
+                        {{(match.playerStats.kills/match.playerStats.deaths).toFixed(1)}}
+                      </div>
+                      <div class="negative-ratio" v-if="((match.playerStats.kills/match.playerStats.deaths) < 1)">
+                        {{(match.playerStats.kills/match.playerStats.deaths).toFixed(1)}}
+                      </div>
+                    </td>
+                    <td>
+                      {{match.map}}
+                    </td>
+                    <td>
+                      {{displayDate(match.createdAt)}}
+                    </td>
+                    <td>
+                      {{match.opponent.opponentUsername}}
+                    </td>
+                    <td>
+                      <div class="winBar" v-if="match.isWin == true">{{match.isWin ? "Win" : "Lose"}}</div>
+                      <div class="loseBar" v-if="match.isWin == false">{{match.isWin ? "Win" : "Lose"}}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+    </div>
+
     <div class="change-nickname-box" v-if="thisCurrentUser.faceitVerified == true">
     <div class="verify-status-true">
       <h4>User successfully verified!</h4>
@@ -92,6 +162,8 @@
 <script>
 import userService from '@/services/user.service'
 import faceitService from '@/services/faceit.service'
+import matchService from '@/services/match.service';
+import moment from "moment"
 export default {
   name: "Profile-comp",
   data() {
@@ -104,6 +176,7 @@ export default {
       verifyAccept: false,
       faceitNickname: "",
       message: "",
+      userMatchHistory: [],
       }
   },
   methods: {
@@ -190,7 +263,19 @@ export default {
         .catch(e => {
           console.log(e)
         })
-    }
+    },
+    findMatchHistory() {
+      matchService.findMyAllMatches(this.currentUser._id)
+        .then(response => {
+          this.userMatchHistory = response.data
+        // console.log(response);
+      })
+    },
+    displayDate(value) {
+      if (value) {
+        return moment(String(value)).format('MM/DD/YYYY hh:mm a')
+      }
+    },
     },
     computed: {
         currentUser() {
@@ -202,6 +287,7 @@ export default {
             this.$router.push('/login')
       }
       this.getCurrentUser(this.currentUser._id)
+      this.findMatchHistory()
     }
 }
 </script>
@@ -378,6 +464,64 @@ export default {
   width: 6em;
   height: 6em;
   color: #FFD700;
+}
+
+.user-matches-list{
+  color: white;
+}
+
+.user-match-history{
+  margin-top: 2em;
+}
+
+table ,tr td{
+    border: 0px solid #000;
+    text-align: center;
+    
+}
+tbody {
+    display:block;
+    max-height:20em;
+    overflow-y:scroll;
+}
+thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;
+}
+thead {
+    width: calc( 100% - 0.6em )/* scrollbar is average 1em/16px width, remove it from thead width */
+}
+
+.table{
+    color: white;
+    background-color: #1a1a1d;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #17171a;
+}
+table.table-bordered > thead > tr > th{
+    border:1px solid #950740;
+}
+table.table-bordered > tbody > tr > td{
+    border:1px solid #6f2232;
+}
+
+.winBar{
+  color: green;
+}
+
+.loseBar{
+  color: red;
+}
+
+.positive-ratio{
+  color: green;
+}
+
+.negative-ratio{
+  color: red;
 }
 
 </style>

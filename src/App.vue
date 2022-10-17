@@ -58,7 +58,9 @@ created() {
   
   // document.body.style.backgroundColor = "#303033"
   var test = document.body;
-        test.style.backgroundImage = `url(${require('@/assets/background6.png')})`
+  test.style.backgroundImage = `url(${require('@/assets/background6.png')})`
+  test.style.backgroundRepeat = "no-repeat"
+  test.style.backgroundAttachment = "fixed"
   },
     computed: {
         loggedIn() {

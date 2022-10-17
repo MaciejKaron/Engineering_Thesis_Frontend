@@ -33,6 +33,12 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label for="slots">Slots:</label>
+                    <select id="tournament-slots" v-model="tournament.slots" @change="handleSlots($event)">
+                    <option v-for="s in slots" :key="s" :value="s">{{s}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="published">Publish:</label>
                     <input id="tournament-checkbox" type="checkbox" v-model="tournament.published" @change="handlePublished($event)"/>
                 </div>
@@ -66,7 +72,7 @@
                         </div>
                     </div>
                 </div>
-                <button @click="saveTournament" class="btn btn-success add-buttons">Submit</button>
+                <button @click="saveTournament" class="btn btn-success add-buttons submit-button">Submit</button>
                 </div>
                 <div class="after_txt" v-if="submitted">
                     <h5>You submitted successfully!</h5>
@@ -179,12 +185,14 @@ export default {
                 startTime: "",
                 mode: "",
                 level: "",
+                slots: "",
                 image: "",
             players: [],    
             },
           submitted: false,
             modes: ["1v1", "5v5"],
             levels: ["1-3", "4-7", "8-10"],
+            slots: ["16","8","4"],
             tournaments: [],
             currentTournament: null,
             currentIndex: -1,
@@ -224,6 +232,7 @@ export default {
               published: this.tournament.published,
                 mode: this.tournament.mode,
                 level: this.tournament.level,
+                slots: this.tournament.slots,
                 premium: this.tournament.premium,
                 startTime: this.tournament.startTime,
                 image: this.tournament.image,
@@ -251,6 +260,9 @@ export default {
         },
         handleLevel(event) {
           this.level = event.target.value
+        },
+        handleSlots(event) {
+        this.slots = event.target.value
       },
 
       getAllTournaments() {
@@ -492,6 +504,15 @@ export default {
     float: right;
 }
 
+#tournament-slots{
+    margin-left: 1em;
+    background-color: #1a1a1d;
+    color: white;
+    border: 1px solid;
+    border-color: #6f2232;
+    float: right;
+}
+
 #tournament-checkbox {
     accent-color: #6f2232;
     float: right;
@@ -628,6 +649,10 @@ selected-transition-enter-active
 
 .progress-bar{
     background-color: #c3073f !important;
+}
+
+.submit-button{
+    margin-bottom: 1em;
 }
 
 

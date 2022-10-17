@@ -42,6 +42,11 @@
         {{ message }}
         </div>
       </div>
+      <div class="error-register" v-if="errorMessage && !message">
+        <div class="error-txt">
+        {{ errorMessage }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -82,6 +87,7 @@ export default {
             successful: false,
             loading: false,
             message: "",
+            errorMessage: "",
             schema,
         }
     },
@@ -112,7 +118,7 @@ export default {
                     this.loading = false
                 },
                 (error) => {
-                    this.message = 
+                    this.errorMessage = 
                         (error.response &&
                         error.response.data &&
                             error.response.data.message) ||
@@ -189,6 +195,13 @@ label {
   text-align: center;
   font-size: 28px;
   display: block;
+}
+
+.error-txt{
+  text-align: center;
+  font-size: 28px;
+  display: block;
+  color: red;
 }
 
 #thumb-icon{

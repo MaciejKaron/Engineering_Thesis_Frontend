@@ -7,8 +7,8 @@ class MatchService {
         return axios.post(API_URL + 'match', data)
     }
 
-    findMyAllMatches(id, currentPage, pageSize) {
-        return axios.get(API_URL + `matches/${id}?page=${currentPage}&size=${pageSize}`)
+    findMyAllMatches(id) {
+        return axios.get(API_URL + `matches/user/${id}`)
     }
 
     findThisTournamentMatches(id) {

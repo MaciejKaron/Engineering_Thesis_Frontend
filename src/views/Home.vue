@@ -70,10 +70,10 @@
             <div class="row row-details">
                 <div class="col col-md-3">
                 <div class="tournament-players" v-if="tournament.mode == '1v1'">
-                    {{tournament.players.length}} / 16
+                    {{tournament.players.length}} / {{tournament.slots}}
                 </div>
                 <div class="tournament-teams" v-if="tournament.mode == '5v5'">
-                    {{tournament.teams.length}} / 8
+                    {{tournament.teams.length}} / {{tournament.slots}}
                 </div>
                 </div>
                 <div class="col col-sm-3">
@@ -97,8 +97,8 @@
                 <div class="5v5" v-if="currentTournament.mode == '5v5' && currentTournament._id == tournament._id">
                     <button class="join-button" v-if="!currentTournament.teams.includes(thisCurrentUser.team.toString())" @click="joinTeamToTournament()">JOIN WITH TEAM</button>
                     <button class="leave-button" v-if="currentTournament.teams.includes(thisCurrentUser.team.toString())" @click="rejoinTeamFromTournament()">LEAVE</button>
-                    <button class="leave-button" @click="goToInfo()">LADDER</button>
-                    <button class="leave-button" @click="showPopup()" v-if="showAdminBoard || showModeratorBoard">ADD PLAYERS</button>
+                    <button class="leave-button" @click="goToInfo5v5()">LADDER</button>
+                    <button class="leave-button" @click="showPopup()" v-if="showAdminBoard || showModeratorBoard">ADD TEAMS</button>
                 </div>
                 </div>
             </div>
@@ -124,8 +124,8 @@
                     </template>
 
                     <template v-slot:body>
-                        <p class="labelInfo">Search users</p>
-                        <div class="searchBar" v-if="currentUser">
+                        <p class="labelInfo" v-if="currentTournament.mode == '1v1'">Search users</p>
+                        <div class="searchBar" v-if="currentTournament.mode == '1v1'">
                             <div class="searchBar-searcher">
                             <input class="searcher" type="text" id="search" placeholder="Search ..." v-model="searchName" />
                             </div>
@@ -152,6 +152,42 @@
                             </div>
                             </transition>
                         </div>
+
+                        <p class="labelInfo" v-if="currentTournament.mode == '5v5'">Search teams</p>
+                        <div class="searchBar" v-if="currentTournament.mode == '5v5'">
+                            <div class="searchBar-searcher">
+                            <input class="searcher" type="text" id="search" placeholder="Search ..." v-model="searchName" />
+                            </div>
+                            <transition name="searcher-transition">
+                            <div class="searchBar-list">
+                            <div class="search-list" v-if="searchName !== ''">
+                            <div v-if="searchName !== '' && searchTeams.length == 0 ">Nothink found</div>
+                            <div v-if="searchName !== '' && searchTeams.length > 0">Teams:</div>
+                            <ul class="tournament-player-list">
+                            <li class="users-list"
+                                :class="{ teamActive: index == currentIndex}"
+                                v-for="(team, index) in searchTeams" :key="index"
+                                @click="setActiveTeam(team,index)">
+                                <div class="teamAvatar" style="display: inline-block">
+                                    <img class="avatar" v-if="team.ownerAvatar != '' " :src="team.ownerAvatar" />
+                                    <img class="avatar" v-if="team.ownerAvatar == '' " :src="require('@/assets/unknown.jpg')" />
+                                </div>
+                                <div class="teamTag" style="color: red; display: inline-block;">
+                                    {{team.tag}}
+                                </div>
+                                <div class="teamName" style="display: inline-block;">
+                                    {{team.name}}
+                                </div>
+                                    <div class="player-options" v-if="thisTeam">
+                                    <button class="leave-button add-player-button" @click="addTeamToTournament()" v-if="thisTeam._id == team._id">ADD</button>
+                                    <button class="leave-button kick-player-button" @click="kickTeamFromTournament()" v-if="thisTeam._id == team._id">KICK</button>
+                                    </div>
+                            </li>
+                            </ul>
+                            </div>
+                            </div>
+                            </transition>
+                        </div>
                     </template>
 
                     <template v-slot:footer>
@@ -168,6 +204,7 @@ import {useToast} from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import TournamentPopup from "@/components/TournamentPopup.vue"
 import faceitService from "@/services/faceit.service";
+import teamService from "@/services/team.service"
 // import image from "../assets/background.jpg"
 
 export default {
@@ -194,11 +231,14 @@ export default {
             tournamentTitle: "",
             tournamentPlayers: [],
             thisUser: null,
+            thisTeam: null,
             currentUserIndex: -1,
+            currentTeamIndex: -1,
             thisStats: [],
             changePage: false,
             searchName: "",
             allUsers: [],
+            allTeams: [],
         }
     },
     methods: {
@@ -432,17 +472,34 @@ export default {
             console.log(this.thisUser);
             // this.goToProfile()
         },
+        setActiveTeam(team, index) {
+            this.thisTeam = team
+            this.currentTeamIndex = index
+            console.log(this.thisTeam);
+        },
         goToProfile() {
           this.$router.push({name:'UserProfile', params: {id: this.thisUser._id}});
         },
         goToInfo() {
           this.$router.push({name:'tournamentInfo', params: {id: this.currentTournament._id}});
         },
+        goToInfo5v5() {
+          this.$router.push({name:'tournamentInfo5v5', params: {id: this.currentTournament._id}});
+        },
 
         getAllUsers() {
       userService.getAllUsers()
         .then(response => {
           this.allUsers = response.data
+        })
+      .catch(e => {
+            console.log(e)
+        })
+        },
+        getAllTeams() {
+      teamService.getAllTeams()
+        .then(response => {
+        this.allTeams = response.data
         })
       .catch(e => {
             console.log(e)
@@ -474,11 +531,38 @@ export default {
                     console.log(e)
           })
         },
+
+        addTeamToTournament() {
+            var data = {
+                _id: this.thisTeam.owner.toString()
+            }
+            tournamentService.addTeamToTournament(this.currentTournament._id, data)
+                .then(response => {
+                console.log(response.data);
+                })
+                .catch(e => {
+                    console.log(e)
+            })
+        },
+
+        kickTeamFromTournament() {
+            var data = {
+                _id: this.thisTeam._id
+            }
+            tournamentService.leaveTeamFromTournament(this.currentTournament._id, data)
+                .then(response => {
+                console.log(response.data);
+                })
+                .catch(e => {
+                    console.log(e)
+            })
+        }
     },
     mounted() {
         this.getAllPublishedTournaments()
         this.getOneUser(this.currentUser._id)
         this.getAllUsers()
+        this.getAllTeams()
     },
     computed: {
         currentUser() {
@@ -503,12 +587,22 @@ export default {
       return this.allUsers.filter(user => {
         return user.username.toLowerCase().indexOf(this.searchName.toLowerCase()) != -1
       })
+        },
+        searchTeams() {
+      if (this.searchName === '') {
+        return []
+      }
+
+      return this.allTeams.filter(team => {
+         return team.name.toLowerCase().indexOf(this.searchName.toLowerCase()) != -1 
+        })
     },
     },
     created() {
         var test = document.body;
         test.style.backgroundImage = `url(${require('@/assets/background6.png')})`
-        test.style.backgroundPosition = "none"
+        test.style.backgroundRepeat = "no-repeat"
+        test.style.backgroundAttachment = "fixed"
         // test.style.backgroundPosition = "center"
         
         // document.body.style.backgroundColor = "#303033"
@@ -751,4 +845,9 @@ export default {
 .kick-player-button{
     margin-left: 1em;
 }
+
+.teamName{
+    margin-left: 0.5em;
+}
+
 </style>

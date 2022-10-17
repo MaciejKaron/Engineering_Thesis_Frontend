@@ -7,7 +7,7 @@
                  v-for="(player,index) in currentTournamentPlayers.sort((a, b) => (a._id > b._id) ? 1 : -1)" 
                 :key="index"
                 @click="setActiveUser(player, index)">
-                <div class="players">
+                <div :class="{players : currentTournament.slots == 16, 'players-second-bracket' : currentTournament.slots == 8}">
                     <div class="player-country">
                         <country-flag :country=player.faceitCountry size='small'/>
                     </div>
@@ -18,6 +18,7 @@
                         {{player.username}}
                     </div>
                     <div class="player-level">
+                        <font-awesome-icon id="icon-star" icon="star" />
                         {{player.faceitLevel}}
                     </div>
                     <div class="player-setting" v-if="(thisPlayer._id == player._id) && (showAdminBoard || showModeratorBoard)">
@@ -33,7 +34,7 @@
                  v-for="(player,index) in stage2Players.sort((a, b) => (a._id > b._id) ? 1 : -1)" 
                 :key="index"
                 @click="setActiveUser(player, index)">
-                <div class="players-second-bracket">
+                <div :class="{'players-second-bracket' : currentTournament.slots == 16, 'players-third-bracket' : currentTournament.slots == 8}">
                     <div class="player-country">
                         <country-flag :country=player.faceitCountry size='small'/>
                     </div>
@@ -44,6 +45,7 @@
                         {{player.username}}
                     </div>
                     <div class="player-level">
+                        <font-awesome-icon id="icon-star" icon="star" />
                         {{player.faceitLevel}}
                     </div>
                     <div class="player-setting" v-if="(thisPlayer._id == player._id) && (showAdminBoard || showModeratorBoard)">
@@ -59,7 +61,7 @@
                  v-for="(player,index) in stage3Players.sort((a, b) => (a._id > b._id) ? 1 : -1)" 
                 :key="index"
                 @click="setActiveUser(player, index)">
-                <div class="players-third-bracket">
+                <div :class="{'players-third-bracket' : currentTournament.slots == 16, 'players-fourth-bracket' : currentTournament.slots == 8}">
                     <div class="player-country">
                         <country-flag :country=player.faceitCountry size='small'/>
                     </div>
@@ -70,6 +72,7 @@
                         {{player.username}}
                     </div>
                     <div class="player-level">
+                        <font-awesome-icon id="icon-star" icon="star" />
                         {{player.faceitLevel}}
                     </div>
                     <div class="player-setting" v-if="(thisPlayer._id == player._id) && (showAdminBoard || showModeratorBoard)">
@@ -85,7 +88,7 @@
                  v-for="(player,index) in stage4Players.sort((a, b) => (a._id > b._id) ? 1 : -1)" 
                 :key="index"
                 @click="setActiveUser(player, index)">
-                <div class="players-fourth-bracket">
+                <div :class="{'players-fourth-bracket' : currentTournament.slots == 16, 'players-fiveth-bracket' : currentTournament.slots == 8}">
                     <div class="player-country">
                         <country-flag :country=player.faceitCountry size='small'/>
                     </div>
@@ -96,6 +99,7 @@
                         {{player.username}}
                     </div>
                     <div class="player-level">
+                        <font-awesome-icon id="icon-star" icon="star" />
                         {{player.faceitLevel}}
                     </div>
                     <div class="player-setting" v-if="(thisPlayer._id == player._id) && (showAdminBoard || showModeratorBoard)">
@@ -104,7 +108,7 @@
                 </div>
             </div>
         </div>
-        <div class="fiveth-bracket">
+        <div class="fiveth-bracket" v-if="currentTournament.slots == 16">
             <h4 class="title">Round 5</h4>
             <div class="second-players-list" 
                 :class="{ active: index == currentIndex}"
@@ -122,6 +126,7 @@
                         {{player.username}}
                     </div>
                     <div class="player-level">
+                        <font-awesome-icon id="icon-star" icon="star" />
                         {{player.faceitLevel}}
                     </div>
                     <div class="player-setting" v-if="(thisPlayer._id == player._id) && (showAdminBoard || showModeratorBoard)">
@@ -182,6 +187,7 @@
                     </template>
                 </TournamentPopup>
     </div>
+  
     <div class="matchHistory-box">
     <div class="history-info">
         <div class="history-header">Match history</div>
@@ -239,6 +245,7 @@ export default {
             toast: useToast(),
             thisMatch: [],
             currentMatchIndex: -1,
+
         }
     },
     methods: {
@@ -315,6 +322,7 @@ export default {
             this.findOneUserByUsername(this.thisUser.username)
             // console.log(this.thisUser);
         },
+
         setActiveMatch(match, index) {
             this.thisMatch = match
             this.currentMatchIndex = index
@@ -579,7 +587,7 @@ export default {
         findThisTournamentMatches() {
             matchService.findThisTournamentMatches(this.$route.params.id)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     this.matchHistory = response.data
             })
         },
@@ -645,6 +653,7 @@ export default {
     background-color: #1a1a1d;
     box-shadow: 0px 0px 4px 1px #c3073f;
     overflow: auto;
+    color: white;
 }
 
 .second-bracket{
@@ -747,9 +756,8 @@ export default {
 }
 
 .player-setting{
-    margin-left: 1.5em;
     /* display: inline-block; */
-    float: left;
+    float: right;
 }
 
 #popup-player{
@@ -872,5 +880,10 @@ label{
 .match-delete-button{
     margin-left: 1em;
 }
+
+#icon-star{
+    color: #FFD700;
+}
+
 
 </style>

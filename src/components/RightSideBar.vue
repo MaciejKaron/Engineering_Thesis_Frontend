@@ -94,6 +94,7 @@ import userService from "@/services/user.service";
 import teamService from "@/services/team.service";
 import socketioService from "@/services/socketio.service";
 import conversationService from "@/services/conversation.service"
+import {useToast} from 'vue-toast-notification';
 import {chat} from "../store/chat"
 export default {
     props: [
@@ -115,7 +116,8 @@ export default {
             onlineFriends: [],
             myAllFriendsWithoutOnline: [],
             teamInviteSend: false,
-            isInTeam: false
+            isInTeam: false,
+            toast: useToast(),
         };
     },
     methods: {
@@ -191,7 +193,13 @@ export default {
                      
             })
                 .catch(e => {
-                console.log(e);
+                    console.log(e);
+                    this.toast.open({
+                        message: e.response.data,
+                        type: 'error',
+                        position: 'top-left',
+                        duration: 5000,
+                    })
             });
         },
         removeFromPending() {

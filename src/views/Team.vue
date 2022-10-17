@@ -396,7 +396,8 @@ export default {
             if (this.currentTeam.players.length == 5) {
 
                 var data = {
-                    level: this.teamLevel/this.currentTeam.players.length
+                    level: this.teamLevel / this.currentTeam.players.length,
+                    ownerAvatar: this.owner.faceitAvatar
                 }
                 teamService.updateTeam(this.currentTeam._id, data)
                     .then(response => {
