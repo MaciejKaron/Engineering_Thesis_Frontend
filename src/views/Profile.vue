@@ -60,7 +60,7 @@
     </div>
 
     <div class="user-match-history" v-if="this.thisCurrentUser.faceitVerified == true">
-      <h2 style="color: white; text-align: center;">Match History</h2>
+      <h2 style="color: #c3073f; text-align: center;">Match History</h2>
       <div class="user-matches-list">
         <table class="table table-bordered table-striped">
             <thead>
@@ -129,6 +129,49 @@
       </div>
     </div>
 
+    <h3 v-if="testTabv2.length > 2" style="color: #c3073f; text-align: center; margin-top: 4em;">Kills/Deaths</h3>
+    <div class="statistics-graph" v-if="testTabv2.length > 2">
+      <Chart
+        :size="{ width: 1000, height: 420 }"
+        :data="testTabv2"
+        :margin="margin"
+        :direction="direction"
+        :axis="axis">
+
+        <template #layers>
+          <Grid strokeDasharray="2,2" />
+          <Area :dataKeys="['id', 'kills']"  type="normal" :areaStyle="{ fill: 'url(#grad)' }" />
+          <Line :dataKeys="['id', 'kills']" :lineStyle="{ stroke: 'blue' }" type="normal" />
+          <Area :dataKeys="['id', 'deaths']"  type="normal" :areaStyle="{ fill: 'url(#gradv2)' }" />
+          <Line :dataKeys="['id', 'deaths']" :lineStyle="{ stroke: 'red' }" type="normal" />
+
+          <defs>
+        <linearGradient id="grad" gradientTransform="rotate(90)">
+          <stop offset="0%" stop-color="#1919ff" stop-opacity="1" />
+          <stop offset="100%" stop-color="#b2b2ff" stop-opacity="0.2" />
+        </linearGradient>
+        <linearGradient id="gradv2" gradientTransform="rotate(90)">
+          <stop offset="0%" stop-color="#ff9999" stop-opacity="1" />
+          <stop offset="100%" stop-color="#ff1919" stop-opacity="0.2" />
+        </linearGradient>
+      </defs>
+        </template>
+
+        <template #widgets>
+          <Tooltip
+            borderColor="#48CAE4"
+            :config="{
+              id: { hide: true },
+              kills: { color: '#0077b6' },
+              deaths: {  color: 'red' },
+            }"
+          />
+        </template>
+
+      </Chart>
+      
+    </div>
+
     <div class="change-nickname-box" v-if="thisCurrentUser.faceitVerified == true">
     <div class="verify-status-true">
       <h4>User successfully verified!</h4>
@@ -164,8 +207,10 @@ import userService from '@/services/user.service'
 import faceitService from '@/services/faceit.service'
 import matchService from '@/services/match.service';
 import moment from "moment"
+import { Chart, Grid, Line, Tooltip, Area } from 'vue3-charts'
 export default {
   name: "Profile-comp",
+  components: { Chart, Grid, Line, Tooltip, Area },
   data() {
     return {
       thisCurrentUser: [],
@@ -177,6 +222,23 @@ export default {
       faceitNickname: "",
       message: "",
       userMatchHistory: [],
+
+      direction: 'horizontal',
+      margin: {
+      left: 0,
+      top: 20,
+      right: 20,
+      bottom: 0
+      },
+      axis: {
+        secondary: {
+          domain: ['dataMin', 'dataMax + 15'],
+          type: 'linear',
+          ticks: 8
+        }
+      },
+      testTab: [],
+      testTabv2: []
       }
   },
   methods: {
@@ -268,7 +330,14 @@ export default {
       matchService.findMyAllMatches(this.currentUser._id)
         .then(response => {
           this.userMatchHistory = response.data
-        // console.log(response);
+        // console.log(this.userMatchHistory);
+        })
+        .then(() => {
+          for (let i = 0; i < this.userMatchHistory.length; i++) {
+            this.testTab.push({ kills:this.userMatchHistory[i].playerStats.kills, deaths: this.userMatchHistory[i].playerStats.deaths, id: i + 1, map: this.userMatchHistory[i].map})
+          }
+          this.testTabv2 = this.testTab
+        // console.log(this.testTabv2);
       })
     },
     displayDate(value) {
@@ -481,7 +550,7 @@ table ,tr td{
 }
 tbody {
     display:block;
-    max-height:20em;
+    max-height:18.8em;
     overflow-y:scroll;
 }
 thead, tbody tr {
@@ -522,6 +591,16 @@ table.table-bordered > tbody > tr > td{
 
 .negative-ratio{
   color: red;
+}
+
+.chart{
+  color: white;
+}
+
+.statistics-graph{
+  margin-top: 1em;
+  display: flex;
+  justify-content: center;
 }
 
 </style>

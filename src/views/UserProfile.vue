@@ -64,6 +64,120 @@
     </div>
   </div>
     </div>
+
+    <div class="user-match-history" v-if="this.thisUser.faceitVerified == true">
+      <h2 style="color: white; text-align: center;">Match History</h2>
+      <div class="user-matches-list">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        Nickanme
+                    </th>
+                    <th>
+                        Kills 
+                    </th>
+                    <th>
+                        Deaths
+                    </th>
+                    <th>
+                        K/D Ratio 
+                    </th>
+                    <th>
+                        Map
+                    </th>
+                    <th>
+                        Date
+                    </th>
+                    <th>
+                        Opponent
+                    </th>
+                    <th>
+                        Result
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="table-rows">
+                <tr v-for="(match,index) in userMatchHistory" :key="index">
+                    <td>
+                        {{match.player.playerUsername}}
+                    </td>
+                    <td>
+                        {{match.playerStats.kills}}
+                    </td>
+                    <td>
+                      {{match.playerStats.deaths}}
+                    </td>
+                    <td>
+                      <div class="positive-ratio" v-if="((match.playerStats.kills/match.playerStats.deaths) >= 1)">
+                        {{(match.playerStats.kills/match.playerStats.deaths).toFixed(1)}}
+                      </div>
+                      <div class="negative-ratio" v-if="((match.playerStats.kills/match.playerStats.deaths) < 1)">
+                        {{(match.playerStats.kills/match.playerStats.deaths).toFixed(1)}}
+                      </div>
+                    </td>
+                    <td>
+                      {{match.map}}
+                    </td>
+                    <td>
+                      {{displayDate(match.createdAt)}}
+                    </td>
+                    <td>
+                      {{match.opponent.opponentUsername}}
+                    </td>
+                    <td>
+                      <div class="winBar" v-if="match.isWin == true">{{match.isWin ? "Win" : "Lose"}}</div>
+                      <div class="loseBar" v-if="match.isWin == false">{{match.isWin ? "Win" : "Lose"}}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3 v-if="testTabv2.length > 2" style="color: #c3073f; text-align: center; margin-top: 4em;">Kills/Deaths</h3>
+    <div class="statistics-graph" v-if="testTabv2.length > 2">
+      <Chart
+        :size="{ width: 1000, height: 420 }"
+        :data="testTabv2"
+        :margin="margin"
+        :direction="direction"
+        :axis="axis">
+
+        <template #layers>
+          <Grid strokeDasharray="2,2" />
+          <Area :dataKeys="['id', 'kills']"  type="normal" :areaStyle="{ fill: 'url(#grad)' }" />
+          <Line :dataKeys="['id', 'kills']" :lineStyle="{ stroke: 'blue' }" type="normal" />
+          <Area :dataKeys="['id', 'deaths']"  type="normal" :areaStyle="{ fill: 'url(#gradv2)' }" />
+          <Line :dataKeys="['id', 'deaths']" :lineStyle="{ stroke: 'red' }" type="normal" />
+
+          <defs>
+        <linearGradient id="grad" gradientTransform="rotate(90)">
+          <stop offset="0%" stop-color="#1919ff" stop-opacity="1" />
+          <stop offset="100%" stop-color="#b2b2ff" stop-opacity="0.2" />
+        </linearGradient>
+        <linearGradient id="gradv2" gradientTransform="rotate(90)">
+          <stop offset="0%" stop-color="#ff9999" stop-opacity="1" />
+          <stop offset="100%" stop-color="#ff1919" stop-opacity="0.2" />
+        </linearGradient>
+      </defs>
+        </template>
+
+        <template #widgets>
+          <Tooltip
+            borderColor="#48CAE4"
+            :config="{
+              id: { hide: true },
+              kills: { color: '#0077b6' },
+              deaths: {  color: 'red' },
+            }"
+          />
+        </template>
+
+      </Chart>
+      
+    </div>
+
 <div class="addFriend-buttons">
 <button class="profile-button-add customButton" v-if="((!thisUser.invitations.includes(thisCurrentUser._id)) && (!thisUser.pendingFriends.includes(thisCurrentUser._id)) && (!thisUser.friends.includes(thisCurrentUser._id)) && (thisUser._id !== thisCurrentUser._id))" @click="addToPending(); sendInviteFriendsSocket(); sendInviteFriendsSocketInfo(); createNotification()">Add to friends</button>
 <button class="profile-button-undo customButton" v-if="thisUser.invitations.includes(thisCurrentUser._id)" @click="removeFromPending(); sendInviteFriendsRemoveUndoSocket()">Undo sending the invitation</button>
@@ -79,8 +193,12 @@ import userService from '@/services/user.service'
 import socketioService from '@/services/socketio.service'
 import notificationService from '@/services/notification.service'
 import faceitService from '@/services/faceit.service'
+import moment from "moment"
+import matchService from '@/services/match.service';
+import { Chart, Grid, Line, Tooltip, Area } from 'vue3-charts'
 export default {
     name: "UserProfile-comp",
+    components: { Chart, Grid, Line, Tooltip, Area },
     data() {
         return {
             thisUser: null,
@@ -90,6 +208,24 @@ export default {
             thisStats: [],
             thisUserInfo: [],
             thisGameStats: [],
+
+            userMatchHistory: [],
+            testTab: [],
+            testTabv2: [],
+            direction: 'horizontal',
+            margin: {
+            left: 0,
+            top: 20,
+            right: 20,
+            bottom: 0
+            },
+            axis: {
+                secondary: {
+                domain: ['dataMin', 'dataMax + 15'],
+                type: 'linear',
+                ticks: 8
+                }
+            },
         }
     },
     methods: {
@@ -276,6 +412,27 @@ export default {
             // console.log(this.thisGameStats);
             })
         },
+
+        displayDate(value) {
+            if (value) {
+                return moment(String(value)).format('MM/DD/YYYY hh:mm a')
+            }
+        },
+
+        findMatchHistory() {
+            matchService.findMyAllMatches(this.$route.params.id)
+                .then(response => {
+                this.userMatchHistory = response.data
+                // console.log(response);
+                })
+                .then(() => {
+                    for (let i = 0; i < this.userMatchHistory.length; i++) {
+                        this.testTab.push({ kills:this.userMatchHistory[i].playerStats.kills, deaths: this.userMatchHistory[i].playerStats.deaths, id: i + 1, map: this.userMatchHistory[i].map})
+                    }
+                    this.testTabv2 = this.testTab
+                    // console.log(this.testTabv2);
+                })
+        },
         
     },
     mounted() {
@@ -283,6 +440,7 @@ export default {
         this.getOneUser(this.$route.params.id)
         this.getOneCurrentUser(this.currentUser._id)
         this.getFriendsInviteSocket()
+        this.findMatchHistory()
     },
     computed: {
         currentUser() {
@@ -411,5 +569,73 @@ export default {
 
 .welcome-no-verified{
     margin-top: 1em;
+}
+
+.user-matches-list{
+  color: white;
+}
+
+.user-match-history{
+  margin-top: 2em;
+}
+
+table ,tr td{
+    border: 0px solid #000;
+    text-align: center;
+    
+}
+tbody {
+    display:block;
+    max-height:20em;
+    overflow-y:scroll;
+}
+thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;
+}
+thead {
+    width: calc( 100% - 0.6em )/* scrollbar is average 1em/16px width, remove it from thead width */
+}
+
+.table{
+    color: white;
+    background-color: #1a1a1d;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #17171a;
+}
+table.table-bordered > thead > tr > th{
+    border:1px solid #950740;
+}
+table.table-bordered > tbody > tr > td{
+    border:1px solid #6f2232;
+}
+
+.winBar{
+  color: green;
+}
+
+.loseBar{
+  color: red;
+}
+
+.positive-ratio{
+  color: green;
+}
+
+.negative-ratio{
+  color: red;
+}
+
+.chart{
+  color: white;
+}
+
+.statistics-graph{
+  margin-top: 1em;
+  display: flex;
+  justify-content: center;
 }
 </style>

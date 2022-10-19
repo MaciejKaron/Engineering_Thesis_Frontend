@@ -5,11 +5,13 @@
       <div class="navbar-nav mr-auto">
         <li v-if="currentUser" class="nav-item">
           <router-link to="/home" class="nav-link">
-            <font-awesome-icon icon="home" /> Home
+            <font-awesome-icon icon="home" /> <div class="changedResolution" style="display: inline-block">Home</div>
           </router-link>
         </li>
         <li v-if="showAdminBoard" class="nav-item">
-          <router-link to="/admin" class="nav-link">Admin Board</router-link>
+          <router-link to="/admin" class="nav-link">
+            <font-awesome-icon icon="wrench" />  <div class="changedResolution" style="display: inline-block">Admin Board</div>
+          </router-link>
         </li>
         <!-- <li v-if="showModeratorBoard" class="nav-item">
           <router-link to="/mod" class="nav-link">Moderator Board</router-link>
@@ -20,13 +22,13 @@
         <li class="nav-item">
           <router-link v-if="currentUser" to="/premium" class="nav-link">
             <font-awesome-icon icon="crown" />
-            Premium
+            <div class="changedResolution" style="display: inline-block">Premium</div>
           </router-link>
         </li>
         <li class="nav-item">
           <router-link v-if="currentUser" to="/ranking" class="nav-link">
             <font-awesome-icon icon="ranking-star" />
-            Ranking
+            <div class="changedResolution" style="display: inline-block">Ranking</div>
           </router-link>
         </li>
         <!-- SEARCHBAR -->
@@ -52,6 +54,7 @@
               :class="{ active: index == currentIndex}"
               v-for="(team, index) in searchTeams" :key="index"
               @click="setActiveTeam(team,index)">
+              <img class="avatar" v-if="team.ownerAvatar != '' " :src="team.ownerAvatar" />
                 {{team.name}}
           </li>
         </ul>
@@ -75,7 +78,7 @@
       <li class="nav-item">
         <router-link to="/team" class="nav-link">
           <font-awesome-icon icon="people-group" />
-          Team
+          <div class="changedResolution" style="display: inline-block">Team</div>
         </router-link>
       </li>
       <!-- <li class="nav-item">
@@ -87,13 +90,13 @@
       <li class="nav-item" @click="$emit('toggleBar')">
       <div class="nav-link" id="friends">
         <font-awesome-icon icon="handshake" />
-        Friends
+        <div class="changedResolution" style="display: inline-block">Friends</div>
         </div>
       </li>
         <li class="nav-item">
           <router-link to="/profile" class="nav-link">
             <font-awesome-icon icon="user" />
-            {{ currentUser.username }}
+            <div class="changedResolution" style="display: inline-block">{{ currentUser.username }}</div>
           </router-link>
         </li>
         <li class="nav-item" @click="$emit('toggleNotifications')">
@@ -103,7 +106,7 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" @click.prevent="logOut">
-            <font-awesome-icon icon="sign-out-alt" /> LogOut
+            <font-awesome-icon icon="sign-out-alt" /> <div class="changedResolution" style="display: inline-block">logOut</div>
           </a>
         </li>
       </div>
@@ -340,5 +343,26 @@ export default {
   max-height: 2em;
   border-radius: 66px;
 }
+
+@media (max-width:1180px){
+  .changedResolution {
+            display: none !important;
+        }
+
+    }
+
+    @media (max-width:670px){
+  .navbar-brand {
+            display: none !important;
+        }
+
+    }
+
+    @media (max-width:560px){
+  .searchBar {
+            display: none !important;
+        }
+
+    }
 
 </style>

@@ -6,22 +6,7 @@
         <div class="input-button inline">
         <button class="btn btn-outline-dark" type="button" @click="filteredTitle">Search</button>
     </div>
-        <!-- <div class="tournament-pagination inline">
-            Items per Page:
-            <select class="select-item" v-model="pageSize" @change="handlePageSizeChange($event)">
-            <option class="selected-item" v-for="size in pageSizes" :key="size" :value="size"> {{ size }}</option>
-            </select>
-        <div class="pagination-box inline">
-          <div class="pagination-container inline">
-            <div class="pagination-wrapper inline">
-                <button class="pagination-button" @click="previousPage();"><font-awesome-icon icon="arrow-left" /></button>
-            </div>
-            <div class="pagination-wrapper inline">
-                <button class="pagination-button" @click="nextPage();"><font-awesome-icon icon="arrow-right" /></button>
-            </div>
-          </div>  
-        </div>
-    </div> -->
+       
     </div>
 <div class="main">
     <div class="pagination-wrapper inline">
@@ -556,7 +541,8 @@ export default {
                 .catch(e => {
                     console.log(e)
             })
-        }
+        },
+
     },
     mounted() {
         this.getAllPublishedTournaments()
@@ -849,5 +835,59 @@ export default {
 .teamName{
     margin-left: 0.5em;
 }
+
+@media (max-width:1500px){
+    .tournaments-list{
+    margin-right: 1.5em;
+    margin-left: 1.5em;
+}
+}
+
+@media (max-width:1450px){
+    .tournaments-list{
+    margin-right: 1em;
+    margin-left: 1em;
+}
+}
+
+@media (max-width:1400px){
+    .tournaments-list{
+    width: 22em;
+}
+.tournament-image{
+    width: 22em;
+}
+}
+
+@media (max-width:1300px){
+    .tournaments-list{
+    width: 20em;
+}
+.tournament-image{
+    width: 20em;
+}
+}
+
+@media (max-width:1200px){
+    .tournaments-list{
+    width: 18em;
+}
+.tournament-image{
+    width: 18em;
+}
+}
+
+@media (max-width:1100px){
+    .tournaments-list{
+    width: 16em;
+    height: 26em;
+}
+.tournament-image{
+    width: 16em;
+    height: 12em;
+}
+}
+
+
 
 </style>
