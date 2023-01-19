@@ -35,7 +35,7 @@
                 <div class="form-group">
                     <label for="slots">Slots:</label>
                     <select id="tournament-slots" v-model="tournament.slots" @change="handleSlots($event)">
-                    <option v-for="s in slots" :key="s" :value="s">{{s}}</option>
+                    <option v-for="s in slotsType" :key="s" :value="s">{{s}}</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -192,7 +192,7 @@ export default {
           submitted: false,
             modes: ["1v1", "5v5"],
             levels: ["1-3", "4-7", "8-10"],
-            slots: ["16","8","4"],
+            slotsType: ["16","8","4"],
             tournaments: [],
             currentTournament: null,
             currentIndex: -1,

@@ -66,7 +66,7 @@
     </div>
 
     <div class="user-match-history" v-if="this.thisUser.faceitVerified == true">
-      <h2 style="color: white; text-align: center;">Match History</h2>
+      <h2 style="color: #c3073f; text-align: center;">Match History</h2>
       <div class="user-matches-list">
         <table class="table table-bordered table-striped">
             <thead>
@@ -551,6 +551,7 @@ export default {
 }
 
 .addFriend-buttons{
+    margin-bottom: 2em;
     margin-top: 3em;
     text-align: center;
 }
@@ -586,7 +587,7 @@ table ,tr td{
 }
 tbody {
     display:block;
-    max-height:20em;
+    max-height:18.8em;
     overflow-y:scroll;
 }
 thead, tbody tr {
